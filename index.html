@@ -1,0 +1,556 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Strateg ME - Kalkulator Promocji</title>
+    <!-- Pobieramy style Tailwind CSS (odpowiadają za nowoczesny wygląd) -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* Drobne poprawki, żeby działało idealnie na telefonie */
+        body { -webkit-tap-highlight-color: transparent; }
+        .toggle-checkbox:checked {
+            right: 0;
+            border-color: #4ade80;
+        }
+        .toggle-checkbox:checked + .toggle-label {
+            background-color: #4ade80;
+        }
+        /* Animacje */
+        .fade-in { animation: fadeIn 0.3s ease-in; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+    </style>
+</head>
+<body class="bg-gray-100 font-sans text-slate-800 pb-24">
+
+    <!-- HEADER -->
+    <header class="bg-yellow-400 p-4 shadow-md border-b-4 border-black sticky top-0 z-50">
+        <div class="flex items-center justify-between max-w-2xl mx-auto">
+            <h1 class="text-xl font-black tracking-wider flex items-center gap-2">
+                <!-- Ikona Kalkulatora -->
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-calculator"><rect width="16" height="20" x="4" y="2" rx="2"/><line x1="8" x2="16" y1="6" y2="6"/><line x1="16" x2="16" y1="14" y2="18"/><path d="M16 10h.01"/><path d="M12 10h.01"/><path d="M8 10h.01"/><path d="M12 14h.01"/><path d="M8 14h.01"/><path d="M12 18h.01"/><path d="M8 18h.01"/></svg>
+                STRATEG ME
+            </h1>
+            <div class="text-xs font-bold bg-black text-yellow-400 px-2 py-1 rounded">
+                v3.0 GITHUB
+            </div>
+        </div>
+    </header>
+
+    <main class="max-w-2xl mx-auto p-4">
+        
+        <!-- FORMULARZ DODAWANIA -->
+        <div class="bg-white p-4 rounded-xl shadow-sm mb-6 border border-gray-200">
+            <div class="grid grid-cols-12 gap-3 items-end">
+                <div class="col-span-12 sm:col-span-5">
+                    <label class="block text-xs font-bold text-gray-500 mb-1">NAZWA (opcja)</label>
+                    <input type="text" id="pName" placeholder="np. Lodówka" class="w-full p-3 border-2 border-gray-200 rounded-lg focus:border-black focus:outline-none text-sm transition-colors">
+                </div>
+                <div class="col-span-6 sm:col-span-3">
+                    <label class="block text-xs font-bold text-gray-500 mb-1">CENA PÓŁKA</label>
+                    <input type="number" id="pPrice" placeholder="0 zł" class="w-full p-3 border-2 border-gray-200 rounded-lg focus:border-black focus:outline-none font-bold transition-colors">
+                </div>
+                <div class="col-span-6 sm:col-span-3">
+                    <label class="block text-xs font-bold text-gray-500 mb-1">KOD (PLN)</label>
+                    <input type="number" id="pCode" placeholder="0 zł" class="w-full p-3 border-2 border-gray-200 rounded-lg focus:border-black focus:outline-none text-sm transition-colors">
+                </div>
+                <div class="col-span-12 sm:col-span-1">
+                    <button onclick="addProduct()" class="w-full bg-black text-yellow-400 h-[48px] rounded-lg flex items-center justify-center hover:bg-gray-800 transition-colors shadow-lg active:scale-95">
+                        <!-- Plus Icon -->
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="M12 5v14"/></svg>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- LISTA PRODUKTÓW -->
+        <div id="productList" class="space-y-3 mb-24">
+            <!-- Tutaj JavaScript wstawi produkty -->
+            <div id="emptyState" class="text-center py-10 text-gray-400 bg-white rounded-xl border-2 border-dashed border-gray-300">
+                <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="mx-auto mb-2 opacity-20"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z"/><path d="M3 6h18"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
+                <p>Dodaj produkty, aby przeliczyć zestaw.</p>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- FOOTER SUMMARY - STICKY BOTTOM -->
+    <div class="fixed bottom-0 left-0 right-0 bg-neutral-900 text-white border-t-4 border-yellow-400 p-4 shadow-[0_-4px_20px_rgba(0,0,0,0.3)] z-40">
+        <div class="max-w-2xl mx-auto">
+            
+            <!-- Pasek statusu promocji -->
+            <div class="flex justify-between items-center mb-3">
+                 <div id="promoBadge" class="text-[10px] sm:text-xs font-bold px-2 py-1 rounded bg-gray-700 text-gray-300 transition-colors">
+                   BRAK MULTIRABATU
+                 </div>
+                 <div class="text-xs text-gray-400">
+                   W puli Multi: <span id="multiCount" class="text-white font-bold">0</span> szt.
+                 </div>
+            </div>
+
+            <div class="flex justify-between items-end">
+                <div>
+                    <div class="text-gray-400 text-[10px] uppercase tracking-wide mb-1">Do zapłaty</div>
+                    <div id="finalTotal" class="text-3xl font-black text-yellow-400 leading-none">
+                        0.00 zł
+                    </div>
+                </div>
+
+                <div class="text-right">
+                    <div class="text-gray-400 text-[10px] uppercase tracking-wide mb-1">Zaoszczędzono</div>
+                    <div id="savedTotal" class="text-xl font-bold leading-none text-white">
+                        0.00 zł
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- JAVASCRIPT LOGIC -->
+    <script>
+        let products = [];
+
+        function addProduct() {
+            const nameInput = document.getElementById('pName');
+            const priceInput = document.getElementById('pPrice');
+            const codeInput = document.getElementById('pCode');
+
+            const name = nameInput.value.trim() || `Produkt ${products.length + 1}`;
+            const price = parseFloat(priceInput.value);
+            const code = parseFloat(codeInput.value) || 0;
+
+            if (!price || price <= 0) return;
+
+            // Logika: jeśli wpisano kod, domyślnie NIE wchodzi do multi. Jeśli brak kodu - wchodzi.
+            const inMultiDefault = (code === 0);
+
+            const newProduct = {
+                id: Date.now(),
+                name: name,
+                basePrice: price,
+                codeValue: code,
+                inMulti: inMultiDefault
+            };
+
+            products.push(newProduct);
+
+            // Reset pól
+            nameInput.value = '';
+            priceInput.value = '';
+            codeInput.value = '';
+            
+            render();
+        }
+
+        function removeProduct(id) {
+            products = products.filter(p => p.id !== id);
+            render();
+        }
+
+        function toggleMulti(id) {
+            const product = products.find(p => p.id === id);
+            if (product) {
+                product.inMulti = !product.inMulti;
+                render();
+            }
+        }
+
+        function render() {
+            const list = document.getElementById('productList');
+            const emptyState = document.getElementById('emptyState');
+
+            // Obliczenia
+            const multiGroup = products.filter(p => p.inMulti).sort((a, b) => a.basePrice - b.basePrice);
+            const soloGroup = products.filter(p => !p.inMulti);
+
+            let totalRegular = 0;
+            let totalFinal = 0;
+            let discountedId = null;
+            let promoText = "BRAK (min. 2 szt.)";
+            let promoColorClass = "bg-gray-700 text-gray-300";
+
+            // 1. SOLO
+            soloGroup.forEach(p => {
+                totalRegular += p.basePrice;
+                let final = p.basePrice;
+                if(p.codeValue > 0) final = Math.max(1, p.basePrice - p.codeValue);
+                totalFinal += final;
+            });
+
+            // 2. MULTI
+            multiGroup.forEach(p => totalRegular += p.basePrice);
+            const count = multiGroup.length;
+            
+            if (count >= 2) {
+                const cheapest = multiGroup[0];
+                discountedId = cheapest.id;
+                
+                let finalForCheapest = cheapest.basePrice;
+
+                if (count === 2) {
+                    finalForCheapest = cheapest.basePrice * 0.70;
+                    promoText = "2 SZT: -30% NA NAJTAŃSZY";
+                    promoColorClass = "bg-lime-500 text-white";
+                } else if (count === 3) {
+                    finalForCheapest = cheapest.basePrice * 0.45;
+                    promoText = "3 SZT: -55% NA NAJTAŃSZY";
+                    promoColorClass = "bg-green-600 text-white";
+                } else if (count === 4) {
+                    finalForCheapest = cheapest.basePrice * 0.20;
+                    promoText = "4 SZT: -80% NA NAJTAŃSZY";
+                    promoColorClass = "bg-orange-500 text-white";
+                } else if (count >= 5) {
+                    finalForCheapest = 1.00;
+                    promoText = "5+ SZT: NAJTAŃSZY ZA 1 ZŁ";
+                    promoColorClass = "bg-red-600 text-white";
+                }
+
+                // Suma grupy multi = (suma wszystkich - cena najtańszego) + nowa cena najtańszego
+                const groupSum = multiGroup.reduce((s, p) => s + p.basePrice, 0);
+                totalFinal += (groupSum - cheapest.basePrice) + finalForCheapest;
+
+            } else {
+                // Za mało do multi
+                multiGroup.forEach(p => totalFinal += p.basePrice);
+            }
+
+            const savedAmount = totalRegular - totalFinal;
+
+            // Renderowanie HTML
+            if (products.length === 0) {
+                list.innerHTML = '';
+                list.appendChild(emptyState);
+                emptyState.style.display = 'block';
+            } else {
+                emptyState.style.display = 'none';
+                list.innerHTML = '';
+
+                // Kopiujemy tablicę products żeby wyświetlać w kolejności dodania (lub odwróconej)
+                // Tutaj: odwrócona kolejność (najnowsze na górze)
+                const displayProducts = [...products].reverse();
+
+                displayProducts.forEach(p => {
+                    const isDiscounted = (p.id === discountedId);
+                    
+                    let finalDisplay = p.basePrice;
+                    let profit = 0;
+                    let styleClass = "border-l-4 border-gray-300"; // default
+
+                    if (p.inMulti) {
+                        if (isDiscounted) {
+                            // Oblicz cenę po rabacie dla tego itemu
+                            if (count >= 5) finalDisplay = 1;
+                            else if (count === 4) finalDisplay = p.basePrice * 0.2;
+                            else if (count === 3) finalDisplay = p.basePrice * 0.45;
+                            else if (count === 2) finalDisplay = p.basePrice * 0.7;
+                            
+                            profit = p.basePrice - finalDisplay;
+                            styleClass = "border-l-4 border-green-500 bg-green-50";
+                        } else {
+                            styleClass = "border-l-4 border-blue-500";
+                        }
+                    } else {
+                        if (p.codeValue > 0) {
+                            finalDisplay = Math.max(1, p.basePrice - p.codeValue);
+                            profit = p.codeValue;
+                            styleClass = "border-l-4 border-purple-500 bg-purple-50";
+                        }
+                    }
+
+                    const itemHTML = `
+                        <div class="bg-white p-4 rounded-lg shadow-sm flex items-center justify-between transition-all fade-in ${styleClass}">
+                            <div class="flex flex-col min-w-0 flex-1 pr-2">
+                                <div class="flex items-center gap-2 mb-1">
+                                    <span class="font-bold text-lg truncate">${p.name}</span>
+                                    ${p.inMulti && isDiscounted ? '<span class="bg-green-600 text-white text-[10px] px-1.5 py-0.5 rounded font-bold uppercase">Rabatowany</span>' : ''}
+                                    ${!p.inMulti && p.codeValue > 0 ? `<span class="bg-purple-600 text-white text-[10px] px-1.5 py-0.5 rounded font-bold uppercase">KOD -${p.codeValue}</span>` : ''}
+                                </div>
+                                <div class="flex items-baseline gap-2">
+                                    <span class="font-extrabold text-xl">${finalDisplay.toFixed(2)} zł</span>
+                                    ${profit > 0 ? `<span class="text-xs text-gray-400 line-through">${p.basePrice} zł</span>` : ''}
+                                </div>
+                                ${profit > 0 ? `<div class="text-xs font-bold text-green-600 mt-1">Zysk: ${profit.toFixed(2)} zł</div>` : ''}
+                            </div>
+
+                            <div class="flex flex-col items-end gap-3">
+                                <!-- Custom Toggle Button HTML -->
+                                <button onclick="toggleMulti(${p.id})" class="relative inline-flex h-7 w-16 items-center rounded-full transition-colors focus:outline-none ${p.inMulti ? 'bg-blue-600' : 'bg-gray-300'}">
+                                    <span class="inline-block h-5 w-5 transform rounded-full bg-white transition-transform ${p.inMulti ? 'translate-x-10' : 'translate-x-1'}"></span>
+                                    <span class="absolute text-[9px] font-bold text-white ${p.inMulti ? 'left-2' : 'right-2'}">
+                                        ${p.inMulti ? 'MULTI' : 'SOLO'}
+                                    </span>
+                                </button>
+
+                                <button onclick="removeProduct(${p.id})" class="text-gray-300 hover:text-red-500 p-1 transition-colors">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/></svg>
+                                </button>
+                            </div>
+                        </div>
+                    `;
+                    list.innerHTML += itemHTML;
+                });
+            }
+
+            // Update footer
+            document.getElementById('finalTotal').innerText = totalFinal.toFixed(2) + " zł";
+            document.getElementById('savedTotal').innerText = savedAmount.toFixed(2) + " zł";
+            
+            const savedEl = document.getElementById('savedTotal');
+            if (savedAmount > 0) savedEl.classList.replace('text-white', 'text-green-400');
+            else savedEl.classList.replace('text-green-400', 'text-white');
+
+            document.getElementById('multiCount').innerText = count;
+            const badge = document.getElementById('promoBadge');
+            badge.innerText = promoText;
+            badge.className = `text-[10px] sm:text-xs font-bold px-2 py-1 rounded transition-colors ${promoColorClass}`;
+        }
+
+        // Init
+        render();
+
+        // Obsługa entera w inputach
+        document.querySelectorAll('input').forEach(input => {
+            input.addEventListener('keypress', function (e) {
+                if (e.key === 'Enter') {
+                    addProduct();
+                }
+            });
+        });
+
+    </script>
+</body>
+</html>
+
+        multiPromoLabel = "3 SZT: -55% NA NAJTAŃSZY";
+        multiPromoColor = "bg-green-600 text-white";
+      } else if (count === 4) {
+        multiplier = 0.20; // -80%
+        multiPromoLabel = "4 SZT: -80% NA NAJTAŃSZY";
+        multiPromoColor = "bg-orange-500 text-white";
+      } else if (count >= 5) {
+        fixedPrice = 1.00; // 1 zł
+        multiPromoLabel = "5+ SZT: NAJTAŃSZY ZA 1 ZŁ";
+        multiPromoColor = "bg-red-600 text-white";
+      }
+
+      let priceAfterDiscount = cheapest.basePrice;
+      if (fixedPrice !== null) {
+        priceAfterDiscount = fixedPrice;
+      } else {
+        priceAfterDiscount = cheapest.basePrice * multiplier;
+      }
+
+      // Sumujemy ceny: (Suma całej grupy) - (Cena najtańszego) + (Cena po rabacie)
+      const groupSumBase = multiGroup.reduce((sum, p) => sum + p.basePrice, 0);
+      const groupSumFinal = (groupSumBase - cheapest.basePrice) + priceAfterDiscount;
+      
+      totalFinalPrice += groupSumFinal;
+      discountAmount = groupSumBase - groupSumFinal;
+
+    } else {
+      // Za mało produktów w multi, liczymy normalnie
+      multiGroup.forEach(p => totalFinalPrice += p.basePrice);
+    }
+
+    return {
+      totalRegularPrice,
+      totalFinalPrice,
+      saved: totalRegularPrice - totalFinalPrice,
+      discountedId,
+      multiPromoLabel,
+      multiPromoColor,
+      multiCount: count
+    };
+
+  }, [products]);
+
+  return (
+    <div className="min-h-screen bg-gray-100 font-sans text-slate-800 pb-20">
+      {/* Header w stylu ME */}
+      <header className="bg-yellow-400 p-4 shadow-md border-b-4 border-black sticky top-0 z-10">
+        <div className="flex items-center justify-between max-w-2xl mx-auto">
+          <h1 className="text-xl font-black tracking-wider flex items-center gap-2">
+            <Calculator className="w-6 h-6" />
+            STRATEG ME
+          </h1>
+          <div className="text-xs font-bold bg-black text-yellow-400 px-2 py-1 rounded">
+            v2.1 PRO
+          </div>
+        </div>
+      </header>
+
+      <main className="max-w-2xl mx-auto p-4">
+        
+        {/* Formularz dodawania */}
+        <div className="bg-white p-4 rounded-xl shadow-sm mb-6 border border-gray-200">
+          <div className="grid grid-cols-12 gap-3 items-end">
+            <div className="col-span-12 sm:col-span-5">
+              <label className="block text-xs font-bold text-gray-500 mb-1">NAZWA (opcja)</label>
+              <input 
+                type="text" 
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                placeholder="np. Lodówka"
+                className="w-full p-3 border-2 border-gray-200 rounded-lg focus:border-black focus:outline-none text-sm"
+              />
+            </div>
+            <div className="col-span-6 sm:col-span-3">
+              <label className="block text-xs font-bold text-gray-500 mb-1">CENA PÓŁKA</label>
+              <input 
+                type="number" 
+                value={price}
+                onChange={(e) => setPrice(e.target.value)}
+                placeholder="0 zł"
+                className="w-full p-3 border-2 border-gray-200 rounded-lg focus:border-black focus:outline-none font-bold"
+              />
+            </div>
+            <div className="col-span-6 sm:col-span-3">
+              <label className="block text-xs font-bold text-gray-500 mb-1">KOD (PLN)</label>
+              <input 
+                type="number" 
+                value={codeDiscount}
+                onChange={(e) => setCodeDiscount(e.target.value)}
+                placeholder="0 zł"
+                className="w-full p-3 border-2 border-gray-200 rounded-lg focus:border-black focus:outline-none text-sm"
+              />
+            </div>
+            <div className="col-span-12 sm:col-span-1">
+              <button 
+                onClick={addProduct}
+                className="w-full bg-black text-yellow-400 h-[46px] rounded-lg flex items-center justify-center hover:bg-gray-800 transition-colors shadow-lg active:scale-95"
+              >
+                <Plus className="w-6 h-6" />
+              </button>
+            </div>
+          </div>
+        </div>
+
+        {/* Lista produktów */}
+        <div className="space-y-3 mb-24">
+          {products.length === 0 && (
+            <div className="text-center py-10 text-gray-400 bg-white rounded-xl border border-dashed border-gray-300">
+              <ShoppingBag className="w-12 h-12 mx-auto mb-2 opacity-20" />
+              <p>Dodaj produkty, aby przeliczyć zestaw.</p>
+            </div>
+          )}
+
+          {products.map((p) => {
+            const isDiscountedInMulti = p.id === calculations.discountedId;
+            
+            // Obliczanie ceny wyświetlanej na karcie
+            let finalDisplayPrice = p.basePrice;
+            let savingsDisplay = 0;
+            let statusColor = "border-l-4 border-gray-300"; // Default Solo without code
+
+            if (p.inMulti) {
+              if (isDiscountedInMulti) {
+                // To jest ten szczęśliwy produkt
+                if (calculations.multiCount >= 5) finalDisplayPrice = 1;
+                else if (calculations.multiCount === 4) finalDisplayPrice = p.basePrice * 0.2;
+                else if (calculations.multiCount === 3) finalDisplayPrice = p.basePrice * 0.45;
+                else if (calculations.multiCount === 2) finalDisplayPrice = p.basePrice * 0.7;
+                
+                savingsDisplay = p.basePrice - finalDisplayPrice;
+                statusColor = "border-l-4 border-green-500 bg-green-50";
+              } else {
+                // W multi, ale nie najtańszy
+                statusColor = "border-l-4 border-blue-500";
+              }
+            } else {
+              // Solo
+              if (p.codeValue > 0) {
+                finalDisplayPrice = Math.max(1, p.basePrice - p.codeValue);
+                savingsDisplay = p.codeValue;
+                statusColor = "border-l-4 border-purple-500 bg-purple-50";
+              }
+            }
+
+            return (
+              <div key={p.id} className={`bg-white p-4 rounded-lg shadow-sm flex items-center justify-between transition-all ${statusColor}`}>
+                
+                {/* Lewa strona: Info */}
+                <div className="flex flex-col min-w-0 flex-1 pr-2">
+                  <div className="flex items-center gap-2 mb-1">
+                    <span className="font-bold text-lg truncate">{p.name}</span>
+                    {p.inMulti && isDiscountedInMulti && (
+                      <span className="bg-green-600 text-white text-[10px] px-1.5 py-0.5 rounded font-bold uppercase">Rabatowany</span>
+                    )}
+                    {!p.inMulti && p.codeValue > 0 && (
+                      <span className="bg-purple-600 text-white text-[10px] px-1.5 py-0.5 rounded font-bold uppercase">KOD -{p.codeValue}</span>
+                    )}
+                  </div>
+                  
+                  <div className="flex items-baseline gap-2">
+                     <span className="font-extrabold text-xl">{finalDisplayPrice.toFixed(2)} zł</span>
+                     {savingsDisplay > 0 && (
+                       <span className="text-xs text-gray-400 line-through">{p.basePrice} zł</span>
+                     )}
+                  </div>
+                  {savingsDisplay > 0 && (
+                    <div className="text-xs font-bold text-green-600 mt-1">
+                      Zysk: {savingsDisplay.toFixed(2)} zł
+                    </div>
+                  )}
+                </div>
+
+                {/* Prawa strona: Kontrolki */}
+                <div className="flex flex-col items-end gap-3">
+                  
+                  {/* Toggle */}
+                  <button 
+                    onClick={() => toggleMulti(p.id)}
+                    className={`relative inline-flex h-7 w-16 items-center rounded-full transition-colors focus:outline-none ${p.inMulti ? 'bg-blue-600' : 'bg-gray-300'}`}
+                  >
+                     <span className={`inline-block h-5 w-5 transform rounded-full bg-white transition-transform ${p.inMulti ? 'translate-x-10' : 'translate-x-1'}`} />
+                     <span className={`absolute text-[9px] font-bold text-white ${p.inMulti ? 'left-2' : 'right-2'}`}>
+                       {p.inMulti ? 'MULTI' : 'SOLO'}
+                     </span>
+                  </button>
+
+                  <button onClick={() => removeProduct(p.id)} className="text-gray-300 hover:text-red-500 p-1">
+                    <Trash2 className="w-5 h-5" />
+                  </button>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      </main>
+
+      {/* Footer Summary Panel - Sticky Bottom */}
+      <div className="fixed bottom-0 left-0 right-0 bg-neutral-900 text-white border-t-4 border-yellow-400 p-4 shadow-[0_-4px_20px_rgba(0,0,0,0.2)]">
+        <div className="max-w-2xl mx-auto">
+          
+          {/* Status Pasek */}
+          <div className="flex justify-between items-center mb-3">
+             <div className={`text-xs font-bold px-2 py-1 rounded ${calculations.multiPromoColor}`}>
+               {calculations.multiPromoLabel}
+             </div>
+             <div className="text-xs text-gray-400">
+               W puli Multi: <span className="text-white font-bold">{calculations.multiCount}</span> szt.
+             </div>
+          </div>
+
+          <div className="flex justify-between items-end">
+            <div>
+              <div className="text-gray-400 text-xs uppercase tracking-wide mb-1">Do zapłaty</div>
+              <div className="text-3xl font-black text-yellow-400 leading-none">
+                {calculations.totalFinalPrice.toFixed(2)} zł
+              </div>
+            </div>
+
+            <div className="text-right">
+              <div className="text-gray-400 text-xs uppercase tracking-wide mb-1">Zaoszczędzono</div>
+              <div className={`text-xl font-bold leading-none ${calculations.saved > 0 ? 'text-green-400' : 'text-white'}`}>
+                {calculations.saved.toFixed(2)} zł
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default App;
+
