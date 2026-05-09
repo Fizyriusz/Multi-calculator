@@ -3,471 +3,422 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Optymalizator Promocji - Media Expert</title>
+    <title>Kalkulator Multi-Rabat ME PRO</title>
     <style>
         :root {
-            --bg-color: #f3f4f6;
             --me-yellow: #ffe600;
-            --me-yellow-hover: #e5cf00;
-            --card-bg: #ffffff;
-            --text-main: #1f2937;
-            --text-muted: #6b7280;
-            --border: #e5e7eb;
-            --danger: #ef4444;
+            --me-dark: #1a1a1a;
+            --bg: #f0f2f5;
+            --card: #ffffff;
+            --border: #d1d5db;
             --success: #10b981;
+            --danger: #ef4444;
         }
 
         body {
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-            background-color: var(--bg-color);
-            color: var(--text-main);
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--bg);
+            color: var(--me-dark);
             margin: 0;
-            padding: 10px;
-            box-sizing: border-box;
+            padding: 20px;
         }
 
         .container {
-            max-width: 800px;
+            max-width: 1100px;
             margin: 0 auto;
-            background: var(--card-bg);
-            padding: 20px;
+            background: var(--card);
+            padding: 30px;
             border-radius: 12px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
         }
 
-        h1 {
-            font-size: 1.5rem;
+        header {
             text-align: center;
-            margin-top: 0;
-            color: #000;
-            border-bottom: 3px solid var(--me-yellow);
+            border-bottom: 4px solid var(--me-yellow);
+            margin-bottom: 30px;
             padding-bottom: 10px;
-            display: inline-block;
-            width: 100%;
-        }
-
-        .product-row {
-            display: grid;
-            grid-template-columns: 1fr 1fr 1fr auto;
-            gap: 10px;
+            display: flex;
+            justify-content: space-between;
             align-items: center;
-            padding: 15px;
-            background: #f9fafb;
-            border: 1px solid var(--border);
-            border-radius: 8px;
-            margin-bottom: 10px;
-            position: relative;
         }
 
-        @media (max-width: 600px) {
-            .product-row {
-                grid-template-columns: 1fr;
-                gap: 8px;
-                padding-bottom: 45px;
-            }
-            .btn-remove {
-                position: absolute;
-                bottom: 10px;
-                right: 10px;
-                width: calc(100% - 20px) !important;
-            }
-        }
+        h1 { margin: 0; font-size: 1.8rem; text-transform: uppercase; }
 
-        label {
-            display: block;
-            font-size: 0.75rem;
-            color: var(--text-muted);
-            margin-bottom: 4px;
-            font-weight: bold;
-            text-transform: uppercase;
-        }
-
-        input {
+        .product-table {
             width: 100%;
-            padding: 8px 12px;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+
+        .product-table th {
+            text-align: left;
+            background: #f8fafc;
+            padding: 12px;
+            font-size: 0.85rem;
+            color: #64748b;
+            text-transform: uppercase;
+            border-bottom: 2px solid var(--border);
+        }
+
+        .product-row td {
+            padding: 10px;
+            border-bottom: 1px solid #edf2f7;
+        }
+
+        input[type="text"], input[type="number"] {
+            width: 100%;
+            padding: 10px;
             border: 1px solid var(--border);
             border-radius: 6px;
-            font-size: 1rem;
             box-sizing: border-box;
-            transition: border-color 0.2s;
+            font-size: 1rem;
         }
 
-        input:focus {
-            outline: none;
-            border-color: #000;
+        .exclude-col { text-align: center; width: 100px; }
+        .exclude-col input { width: 20px; height: 20px; cursor: pointer; }
+
+        .actions {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 30px;
         }
 
         button {
-            cursor: pointer;
+            padding: 12px 20px;
             border: none;
             border-radius: 6px;
             font-weight: bold;
-            transition: background-color 0.2s;
-        }
-
-        .btn-add {
-            background-color: var(--border);
-            color: var(--text-main);
-            padding: 10px 15px;
-            width: 100%;
+            cursor: pointer;
+            transition: all 0.2s;
             font-size: 1rem;
-            margin-bottom: 20px;
         }
 
-        .btn-add:hover { background-color: #d1d5db; }
+        .btn-add { background: #e2e8f0; color: #475569; }
+        .btn-add:hover { background: #cbd5e1; }
 
-        .btn-calc {
-            background-color: var(--me-yellow);
-            color: #000;
-            padding: 15px;
-            width: 100%;
+        .btn-clear { background: #fee2e2; color: var(--danger); }
+        .btn-clear:hover { background: #fecaca; }
+
+        .btn-calc { 
+            background: var(--me-yellow); 
+            color: #000; 
+            flex-grow: 1; 
             font-size: 1.2rem;
             text-transform: uppercase;
-            letter-spacing: 0.5px;
-            box-shadow: 0 4px 6px rgba(255, 230, 0, 0.3);
         }
+        .btn-calc:hover { background: #e5cf00; transform: translateY(-1px); }
 
-        .btn-calc:hover { background-color: var(--me-yellow-hover); }
+        .results { display: none; margin-top: 40px; animation: fadeIn 0.5s; }
 
-        .btn-remove {
-            background-color: #fee2e2;
-            color: var(--danger);
-            padding: 10px;
-            height: 100%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .btn-remove:hover { background-color: #fecaca; }
-
-        .results {
-            margin-top: 30px;
-            padding-top: 20px;
-            border-top: 2px dashed var(--border);
-            display: none;
-        }
-
-        .summary-card {
-            background: #000;
+        .summary-box {
+            background: var(--me-dark);
             color: #fff;
-            padding: 20px;
-            border-radius: 8px;
+            padding: 25px;
+            border-radius: 12px;
             text-align: center;
-            margin-bottom: 20px;
+            margin-bottom: 30px;
         }
 
-        .summary-price {
-            font-size: 2.5rem;
-            font-weight: bold;
-            color: var(--me-yellow);
-            margin: 10px 0;
+        .summary-price { font-size: 3rem; color: var(--me-yellow); font-weight: 800; }
+
+        .grid-results {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
         }
 
-        .saving {
-            color: var(--success);
-            font-size: 1.1rem;
-            font-weight: bold;
-        }
-
-        .group-card {
+        .order-card {
             background: #fff;
-            border: 1px solid var(--border);
-            border-radius: 8px;
-            padding: 15px;
-            margin-bottom: 15px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+            border: 2px solid #e2e8f0;
+            border-radius: 10px;
+            padding: 20px;
         }
 
-        .group-title {
-            font-weight: bold;
-            font-size: 1.1rem;
-            margin-bottom: 10px;
-            color: var(--text-main);
+        .order-card h3 { 
+            margin-top: 0; 
+            border-bottom: 2px solid var(--me-yellow); 
+            padding-bottom: 10px;
             display: flex;
             justify-content: space-between;
         }
 
-        .group-item {
+        .item-list { list-style: none; padding: 0; }
+        .item-list li {
             display: flex;
             justify-content: space-between;
-            padding: 5px 0;
-            border-bottom: 1px solid #f3f4f6;
-            font-size: 0.95rem;
+            padding: 8px 0;
+            border-bottom: 1px solid #f1f5f9;
         }
 
-        .group-item:last-child {
-            border-bottom: none;
-        }
-        
-        .rabat-info {
-            color: var(--danger);
+        .discount-badge {
+            background: #dcfce7;
+            color: #166534;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 0.8rem;
             font-weight: bold;
-            font-size: 0.9rem;
-            margin-top: 10px;
-            text-align: right;
         }
 
-        .warning {
-            color: var(--danger);
-            font-size: 0.9rem;
-            margin-bottom: 15px;
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+        .loader {
+            display: none;
             text-align: center;
+            padding: 20px;
+            font-weight: bold;
+            color: #64748b;
         }
     </style>
 </head>
 <body>
 
 <div class="container">
-    <h1>Optymalizator Koszyka</h1>
-    <p style="text-align:center; font-size:0.9rem; color:#6b7280;">
-        Wprowadź produkty. Kalkulator sprawdzi wszystkie kombinacje (osobne kody, 1 wspólny rabat wielosztuk, lub podział na 2 osobne zamówienia Multi-rabat).
-    </p>
+    <header>
+        <h1>Optymalizator Koszyka PRO</h1>
+        <button class="btn-clear" onclick="clearData()">Wyczyść wszystko</button>
+    </header>
 
-    <div id="product-list">
-        </div>
+    <table class="product-table">
+        <thead>
+            <tr>
+                <th>Nazwa produktu</th>
+                <th>Cena wyjściowa (zł)</th>
+                <th>Cena po kodzie (zł)</th>
+                <th class="exclude-col">Wyklucz z Multi</th>
+                <th style="width: 50px;"></th>
+            </tr>
+        </thead>
+        <tbody id="product-body">
+            </tbody>
+    </table>
 
-    <button class="btn-add" onclick="addProduct()">+ Dodaj kolejny produkt</button>
-    <button class="btn-calc" onclick="calculate()">Oblicz najtańszą opcję</button>
+    <div class="actions">
+        <button class="btn-add" onclick="addProduct()">+ Dodaj produkt</button>
+        <button class="btn-calc" onclick="runCalculation()">Oblicz najtańszą kombinację</button>
+    </div>
+
+    <div id="loader" class="loader">Analizowanie tysięcy kombinacji...</div>
 
     <div id="results" class="results">
-        <div class="summary-card">
-            <div>Najlepsza całkowita cena:</div>
-            <div class="summary-price" id="res-total">0,00 zł</div>
-            <div class="saving" id="res-saving">Oszczędzasz: 0,00 zł</div>
+        <div class="summary-box">
+            <div>Najlepsza cena łączna za wszystkie zamówienia:</div>
+            <div class="summary-price" id="total-price">0,00 zł</div>
+            <div style="color: var(--success); font-weight: bold;" id="total-savings"></div>
         </div>
-        <div id="res-groups"></div>
+        <div class="grid-results" id="order-grid"></div>
     </div>
 </div>
 
 <script>
-    let products = [];
-    let nextId = 1;
+    let products = JSON.parse(localStorage.getItem('me_products')) || [
+        { id: Date.now(), name: '', basePrice: '', codePrice: '', excluded: false }
+    ];
 
-    // Funkcja parsująca floaty z obsługą przecinków i kropek (przelicza na grosze by unikać błędów JS)
-    function parsePrice(val) {
-        if(!val) return 0;
-        let parsed = parseFloat(val.toString().replace(/\s/g, '').replace(',', '.'));
-        if(isNaN(parsed) || parsed < 0) return 0;
-        return Math.round(parsed * 100); 
+    function save() {
+        localStorage.setItem('me_products', JSON.stringify(products));
     }
 
-    function formatPrice(grosze) {
-        return (grosze / 100).toFixed(2).replace('.', ',') + ' zł';
-    }
-
-    function renderProducts() {
-        const list = document.getElementById('product-list');
-        list.innerHTML = '';
-        products.forEach((p, index) => {
-            const row = document.createElement('div');
-            row.className = 'product-row';
-            row.innerHTML = `
-                <div>
-                    <label>Nazwa (opcjonalnie)</label>
-                    <input type="text" placeholder="Produkt ${index + 1}" value="${p.name}" onchange="updateProduct(${p.id}, 'name', this.value)">
-                </div>
-                <div>
-                    <label>Cena wyjściowa (zł) *</label>
-                    <input type="number" step="0.01" min="0" placeholder="np. 2999.99" value="${p.basePrice || ''}" onchange="updateProduct(${p.id}, 'basePrice', this.value)">
-                </div>
-                <div>
-                    <label>Cena po kodzie (zł)</label>
-                    <input type="number" step="0.01" min="0" placeholder="np. 2899.99" value="${p.codePrice || ''}" onchange="updateProduct(${p.id}, 'codePrice', this.value)">
-                </div>
-                <button class="btn-remove" onclick="removeProduct(${p.id})">✖</button>
+    function render() {
+        const body = document.getElementById('product-body');
+        body.innerHTML = '';
+        products.forEach(p => {
+            const tr = document.createElement('tr');
+            tr.className = 'product-row';
+            tr.innerHTML = `
+                <td><input type="text" placeholder="np. Lodówka" value="${p.name}" oninput="update(${p.id}, 'name', this.value)"></td>
+                <td><input type="number" step="0.01" placeholder="0.00" value="${p.basePrice}" oninput="update(${p.id}, 'basePrice', this.value)"></td>
+                <td><input type="number" step="0.01" placeholder="brak" value="${p.codePrice}" oninput="update(${p.id}, 'codePrice', this.value)"></td>
+                <td class="exclude-col"><input type="checkbox" ${p.excluded ? 'checked' : ''} onchange="update(${p.id}, 'excluded', this.checked)"></td>
+                <td><button style="color:var(--danger); background:none; font-size:1.2rem;" onclick="remove(${p.id})">🗑</button></td>
             `;
-            list.appendChild(row);
+            body.appendChild(tr);
         });
     }
 
     function addProduct() {
-        products.push({ id: nextId++, name: '', basePrice: '', codePrice: '' });
-        renderProducts();
+        products.push({ id: Date.now(), name: '', basePrice: '', codePrice: '', excluded: false });
+        render();
+        save();
     }
 
-    function removeProduct(id) {
+    function remove(id) {
         products = products.filter(p => p.id !== id);
-        renderProducts();
+        render();
+        save();
     }
 
-    function updateProduct(id, field, value) {
-        const product = products.find(p => p.id === id);
-        if(product) {
-            product[field] = value;
+    function update(id, field, value) {
+        const p = products.find(p => p.id === id);
+        if (p) p[field] = value;
+        save();
+    }
+
+    function clearData() {
+        if(confirm("Czy na pewno chcesz wyczyścić wszystkie dane?")) {
+            products = [{ id: Date.now(), name: '', basePrice: '', codePrice: '', excluded: false }];
+            render();
+            save();
+            document.getElementById('results').style.display = 'none';
         }
     }
 
-    // Funkcja obliczająca cenę pakietu multi-rabatowego
-    function getBundleCost(bundle) {
-        let len = bundle.length;
-        if (len === 0) return { cost: 0, discount: 0 };
-        if (len === 1) return { cost: bundle[0].basePriceGrosze, discount: 0 }; 
+    function format(val) {
+        return (val / 100).toFixed(2).replace('.', ',') + ' zł';
+    }
 
-        let sum = 0;
-        let minPrice = Infinity;
+    function getBundleCost(items) {
+        if (items.length === 0) return { total: 0, discount: 0 };
+        if (items.length === 1) return { total: items[0].baseGrosze, discount: 0 };
 
-        for (let p of bundle) {
-            sum += p.basePriceGrosze;
-            if (p.basePriceGrosze < minPrice) minPrice = p.basePriceGrosze;
-        }
-
+        let sum = items.reduce((a, b) => a + b.baseGrosze, 0);
+        let min = Math.min(...items.map(i => i.baseGrosze));
         let discount = 0;
-        if (len === 2) discount = Math.round(minPrice * 0.30);
-        else if (len === 3) discount = Math.round(minPrice * 0.55);
-        else if (len === 4) discount = Math.round(minPrice * 0.80);
-        else if (len >= 5) discount = minPrice - 100; // 1 zł za najtańszy
 
-        return {
-            cost: sum - discount,
-            discount: discount
-        };
+        if (items.length === 2) discount = Math.round(min * 0.30);
+        else if (items.length === 3) discount = Math.round(min * 0.55);
+        else if (items.length === 4) discount = Math.round(min * 0.80);
+        else if (items.length >= 5) discount = min - 100; // za 1 zł
+
+        return { total: sum - discount, discount: discount };
     }
 
-    function calculate() {
-        let n = products.length;
-        if (n === 0) {
-            alert("Dodaj minimum jeden produkt.");
-            return;
-        }
-        if (n > 12) {
-            alert("Maksymalna liczba produktów do optymalizacji to 12.");
-            return;
-        }
-
-        // Przygotowanie danych (weryfikacja wejść)
-        let parsedProducts = products.map((p, index) => {
-            let base = parsePrice(p.basePrice);
-            let code = parsePrice(p.codePrice);
-            if(base === 0) {
-                alert(`Produkt ${index + 1} musi mieć podaną cenę wyjściową > 0.`);
-                throw new Error("Błąd formularza");
-            }
-            return {
-                originalName: p.name || `Produkt ${index + 1}`,
-                basePriceGrosze: base,
-                bestIndivGrosze: (code > 0 && code < base) ? code : base,
-                usedCode: (code > 0 && code < base)
-            };
-        });
-
-        let bestCost = Infinity;
-        let bestAssignment = null;
-        let totalCombos = Math.pow(3, n);
-
-        // Brute-force wszystkich kombinacji:
-        // Każdy produkt może wylądować w: 0 = Osobno (najlepsza z base/code), 1 = Koszyk Multi 1, 2 = Koszyk Multi 2
-        for (let i = 0; i < totalCombos; i++) {
-            let temp = i;
-            let ind = [];
-            let b1 = [];
-            let b2 = [];
-            let currentCost = 0;
-
-            for (let p = 0; p < n; p++) {
-                let state = temp % 3;
-                temp = Math.floor(temp / 3);
-
-                if (state === 0) {
-                    ind.push(parsedProducts[p]);
-                    currentCost += parsedProducts[p].bestIndivGrosze;
-                } else if (state === 1) {
-                    b1.push(parsedProducts[p]);
-                } else {
-                    b2.push(parsedProducts[p]);
-                }
-            }
-
-            let resB1 = getBundleCost(b1);
-            let resB2 = getBundleCost(b2);
-            currentCost += resB1.cost + resB2.cost;
-
-            if (currentCost < bestCost) {
-                bestCost = currentCost;
-                bestAssignment = { 
-                    ind: ind, 
-                    b1: b1, b1_res: resB1,
-                    b2: b2, b2_res: resB2
-                };
-            }
-        }
-
-        displayResults(bestAssignment, bestCost, parsedProducts);
-    }
-
-    function displayResults(assignment, bestCostGrosze, parsedProducts) {
-        const resDiv = document.getElementById('results');
-        const groupsDiv = document.getElementById('res-groups');
+    function runCalculation() {
+        const loader = document.getElementById('loader');
+        const results = document.getElementById('results');
         
-        let sumWithoutPromos = 0;
-        parsedProducts.forEach(p => { sumWithoutPromos += p.basePriceGrosze; });
-        let savings = sumWithoutPromos - bestCostGrosze;
+        // Przygotowanie danych
+        const validProducts = products.filter(p => p.basePrice > 0).map(p => ({
+            name: p.name || "Produkt",
+            baseGrosze: Math.round(parseFloat(p.basePrice) * 100),
+            codeGrosze: p.codePrice ? Math.round(parseFloat(p.codePrice) * 100) : null,
+            excluded: p.excluded
+        }));
 
-        document.getElementById('res-total').innerText = formatPrice(bestCostGrosze);
-        document.getElementById('res-saving').innerText = `Oszczędzasz względem cen wyjściowych: ${formatPrice(savings)}`;
+        if (validProducts.length === 0) return alert("Wpisz ceny produktów!");
 
-        groupsDiv.innerHTML = '';
+        loader.style.display = 'block';
+        results.style.display = 'none';
 
-        // KOSZYK 1: MULTI-RABAT
-        if (assignment.b1.length > 0) {
-            groupsDiv.appendChild(createGroupCard('📦 ZAMÓWIENIE 1 (Multi-Rabat)', assignment.b1, assignment.b1_res.cost, assignment.b1_res.discount));
+        // Timeout, żeby przeglądarka mogła wyświetlić loader przed ciężkimi obliczeniami
+        setTimeout(() => {
+            const best = solve(validProducts);
+            display(best, validProducts);
+            loader.style.display = 'none';
+            results.style.display = 'block';
+        }, 50);
+    }
+
+    function solve(items) {
+        const n = items.length;
+        let bestTotal = Infinity;
+        let bestMap = null;
+
+        // 5 stanów: 0-Luzem, 1-Koszyk1, 2-Koszyk2, 3-Koszyk3, 4-Koszyk4
+        const states = 5;
+        const totalCombos = Math.pow(states, n);
+
+        for (let i = 0; i < totalCombos; i++) {
+            let current = i;
+            let currentTotal = 0;
+            let groups = [[], [], [], [], []]; // 0: luzem, 1-4: koszyki
+            let possible = true;
+
+            for (let j = 0; j < n; j++) {
+                let state = current % states;
+                current = Math.floor(current / states);
+
+                // Jeśli produkt jest wykluczony, a przypisujemy go do koszyka Multi (stany 1-4)
+                if (items[j].excluded && state > 0) {
+                    possible = false;
+                    break;
+                }
+                groups[state].push(items[j]);
+            }
+
+            if (!possible) continue;
+
+            // Liczenie kosztów
+            // Grupa 0 (Luzem)
+            groups[0].forEach(item => {
+                currentTotal += (item.codeGrosze !== null && item.codeGrosze < item.baseGrosze) 
+                                ? item.codeGrosze 
+                                : item.baseGrosze;
+            });
+
+            // Grupy 1-4 (Multi)
+            let res = [
+                getBundleCost(groups[1]),
+                getBundleCost(groups[2]),
+                getBundleCost(groups[3]),
+                getBundleCost(groups[4])
+            ];
+
+            res.forEach(r => currentTotal += r.total);
+
+            if (currentTotal < bestTotal) {
+                bestTotal = currentTotal;
+                bestMap = { groups, res, bestTotal };
+            }
+        }
+        return bestMap;
+    }
+
+    function display(best, allItems) {
+        document.getElementById('total-price').innerText = format(best.bestTotal);
+        
+        let baseSum = allItems.reduce((a, b) => a + b.baseGrosze, 0);
+        document.getElementById('total-savings').innerText = "Łączna oszczędność: " + format(baseSum - best.bestTotal);
+
+        const grid = document.getElementById('order-grid');
+        grid.innerHTML = '';
+
+        // Renderowanie grup Multi
+        for (let i = 1; i <= 4; i++) {
+            if (best.groups[i].length > 0) {
+                const card = document.createElement('div');
+                card.className = 'order-card';
+                let itemsHtml = best.groups[i].map(item => `
+                    <li><span>${item.name}</span> <span>${format(item.baseGrosze)}</span></li>
+                `).join('');
+                
+                card.innerHTML = `
+                    <h3>Zamówienie Multi #${i} <span style="color:var(--success)">${format(best.res[i-1].total)}</span></h3>
+                    <ul class="item-list">${itemsHtml}</ul>
+                    <div style="text-align:right; margin-top:10px;">
+                        <span class="discount-badge">Rabat Multi: -${format(best.res[i-1].discount)}</span>
+                    </div>
+                `;
+                grid.appendChild(card);
+            }
         }
 
-        // KOSZYK 2: MULTI-RABAT
-        if (assignment.b2.length > 0) {
-            groupsDiv.appendChild(createGroupCard('📦 ZAMÓWIENIE 2 (Multi-Rabat)', assignment.b2, assignment.b2_res.cost, assignment.b2_res.discount));
-        }
-
-        // KOSZYK 3: OSOBNO LUB Z KODAMI
-        if (assignment.ind.length > 0) {
-            let indCard = document.createElement('div');
-            indCard.className = 'group-card';
-            let indTitle = `<div class="group-title">🛒 Produkty z kodem dedykowanym lub kupowane osobno bez promocji</div>`;
-            let itemsHtml = assignment.ind.map(p => {
-                let badge = p.usedCode ? ' <span style="background:var(--success); color:white; padding:2px 6px; border-radius:4px; font-size:0.75rem;">Użyto kodu</span>' : '';
-                return `<div class="group-item">
-                    <span>${p.originalName}${badge}</span>
-                    <span>${formatPrice(p.bestIndivGrosze)}</span>
-                </div>`;
+        // Renderowanie grupy Luzem / Kody
+        if (best.groups[0].length > 0) {
+            const card = document.createElement('div');
+            card.className = 'order-card';
+            card.style.borderColor = '#cbd5e1';
+            let itemsHtml = best.groups[0].map(item => {
+                let price = (item.codeGrosze !== null && item.codeGrosze < item.baseGrosze) ? item.codeGrosze : item.baseGrosze;
+                let usedCode = item.codeGrosze !== null && item.codeGrosze < item.baseGrosze;
+                return `<li>
+                    <span>${item.name} ${usedCode ? '<span class="discount-badge" style="background:#e0f2fe; color:#0369a1">KOD</span>' : ''}</span> 
+                    <span>${format(price)}</span>
+                </li>`;
             }).join('');
-            
-            indCard.innerHTML = indTitle + itemsHtml;
-            groupsDiv.appendChild(indCard);
+
+            let groupSum = best.groups[0].reduce((sum, item) => {
+                return sum + ((item.codeGrosze !== null && item.codeGrosze < item.baseGrosze) ? item.codeGrosze : item.baseGrosze);
+            }, 0);
+
+            card.innerHTML = `
+                <h3 style="border-bottom-color:#94a3b8">Kody / Osobno <span>${format(groupSum)}</span></h3>
+                <ul class="item-list">${itemsHtml}</ul>
+            `;
+            grid.appendChild(card);
         }
-
-        resDiv.style.display = 'block';
-        resDiv.scrollIntoView({ behavior: "smooth" });
     }
 
-    function createGroupCard(title, products, totalCostGrosze, discountGrosze) {
-        let card = document.createElement('div');
-        card.className = 'group-card';
-
-        let itemsHtml = products.map(p => `
-            <div class="group-item">
-                <span>${p.originalName}</span>
-                <span>${formatPrice(p.basePriceGrosze)}</span>
-            </div>
-        `).join('');
-
-        let rabatHtml = discountGrosze > 0 
-            ? `<div class="rabat-info">Przyznany Multi-Rabat: -${formatPrice(discountGrosze)}</div>` 
-            : `<div class="rabat-info" style="color:var(--text-muted)">Brak rabatu (wymagane min. 2 produkty w koszyku)</div>`;
-
-        card.innerHTML = `
-            <div class="group-title">
-                <span>${title}</span>
-                <span style="color:var(--success)">Suma: ${formatPrice(totalCostGrosze)}</span>
-            </div>
-            ${itemsHtml}
-            ${rabatHtml}
-        `;
-        return card;
-    }
-
-    // Inicjalizacja z dwoma pustymi polami na start
-    addProduct();
-    addProduct();
+    render();
 </script>
 
 </body>
