@@ -2,868 +2,473 @@
 <html lang="pl">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Strateg ME - V5 FINAL</title>
-    <script src="https://cdn.tailwindcss.com"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Optymalizator Promocji - Media Expert</title>
     <style>
-        body { -webkit-tap-highlight-color: transparent; }
-        .flash-green { animation: flash 0.5s; }
-        @keyframes flash { 0% { background-color: #86efac; } 100% { background-color: white; } }
+        :root {
+            --bg-color: #f3f4f6;
+            --me-yellow: #ffe600;
+            --me-yellow-hover: #e5cf00;
+            --card-bg: #ffffff;
+            --text-main: #1f2937;
+            --text-muted: #6b7280;
+            --border: #e5e7eb;
+            --danger: #ef4444;
+            --success: #10b981;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            margin: 0;
+            padding: 10px;
+            box-sizing: border-box;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: var(--card-bg);
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+        }
+
+        h1 {
+            font-size: 1.5rem;
+            text-align: center;
+            margin-top: 0;
+            color: #000;
+            border-bottom: 3px solid var(--me-yellow);
+            padding-bottom: 10px;
+            display: inline-block;
+            width: 100%;
+        }
+
+        .product-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr auto;
+            gap: 10px;
+            align-items: center;
+            padding: 15px;
+            background: #f9fafb;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            margin-bottom: 10px;
+            position: relative;
+        }
+
+        @media (max-width: 600px) {
+            .product-row {
+                grid-template-columns: 1fr;
+                gap: 8px;
+                padding-bottom: 45px;
+            }
+            .btn-remove {
+                position: absolute;
+                bottom: 10px;
+                right: 10px;
+                width: calc(100% - 20px) !important;
+            }
+        }
+
+        label {
+            display: block;
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            margin-bottom: 4px;
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+
+        input {
+            width: 100%;
+            padding: 8px 12px;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            font-size: 1rem;
+            box-sizing: border-box;
+            transition: border-color 0.2s;
+        }
+
+        input:focus {
+            outline: none;
+            border-color: #000;
+        }
+
+        button {
+            cursor: pointer;
+            border: none;
+            border-radius: 6px;
+            font-weight: bold;
+            transition: background-color 0.2s;
+        }
+
+        .btn-add {
+            background-color: var(--border);
+            color: var(--text-main);
+            padding: 10px 15px;
+            width: 100%;
+            font-size: 1rem;
+            margin-bottom: 20px;
+        }
+
+        .btn-add:hover { background-color: #d1d5db; }
+
+        .btn-calc {
+            background-color: var(--me-yellow);
+            color: #000;
+            padding: 15px;
+            width: 100%;
+            font-size: 1.2rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            box-shadow: 0 4px 6px rgba(255, 230, 0, 0.3);
+        }
+
+        .btn-calc:hover { background-color: var(--me-yellow-hover); }
+
+        .btn-remove {
+            background-color: #fee2e2;
+            color: var(--danger);
+            padding: 10px;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .btn-remove:hover { background-color: #fecaca; }
+
+        .results {
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 2px dashed var(--border);
+            display: none;
+        }
+
+        .summary-card {
+            background: #000;
+            color: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .summary-price {
+            font-size: 2.5rem;
+            font-weight: bold;
+            color: var(--me-yellow);
+            margin: 10px 0;
+        }
+
+        .saving {
+            color: var(--success);
+            font-size: 1.1rem;
+            font-weight: bold;
+        }
+
+        .group-card {
+            background: #fff;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 15px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+        }
+
+        .group-title {
+            font-weight: bold;
+            font-size: 1.1rem;
+            margin-bottom: 10px;
+            color: var(--text-main);
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .group-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 5px 0;
+            border-bottom: 1px solid #f3f4f6;
+            font-size: 0.95rem;
+        }
+
+        .group-item:last-child {
+            border-bottom: none;
+        }
+        
+        .rabat-info {
+            color: var(--danger);
+            font-weight: bold;
+            font-size: 0.9rem;
+            margin-top: 10px;
+            text-align: right;
+        }
+
+        .warning {
+            color: var(--danger);
+            font-size: 0.9rem;
+            margin-bottom: 15px;
+            text-align: center;
+        }
     </style>
 </head>
-<body class="bg-gray-100 font-sans text-slate-800 pb-40">
+<body>
 
-    <header class="bg-yellow-400 p-4 shadow-md border-b-4 border-black sticky top-0 z-50">
-        <div class="flex items-center justify-between max-w-2xl mx-auto">
-            <h1 class="text-xl font-black tracking-wider">STRATEG ME</h1>
-            <div class="text-xs font-bold bg-black text-yellow-400 px-2 py-1 rounded">V5 FINAL</div>
-        </div>
-    </header>
+<div class="container">
+    <h1>Optymalizator Koszyka</h1>
+    <p style="text-align:center; font-size:0.9rem; color:#6b7280;">
+        Wprowadź produkty. Kalkulator sprawdzi wszystkie kombinacje (osobne kody, 1 wspólny rabat wielosztuk, lub podział na 2 osobne zamówienia Multi-rabat).
+    </p>
 
-    <main class="max-w-2xl mx-auto p-4">
-        
-        <div id="inputPanel" class="bg-white p-4 rounded-xl shadow-sm mb-6 border border-gray-200 transition-colors">
-            <div class="grid grid-cols-12 gap-3 items-end">
-                <div class="col-span-12 sm:col-span-5">
-                    <label class="block text-xs font-bold text-gray-500 mb-1">NAZWA</label>
-                    <input type="text" id="pName" placeholder="Produkt..." class="w-full p-3 border-2 border-gray-200 rounded-lg focus:border-black focus:outline-none text-sm">
-                </div>
-                <div class="col-span-6 sm:col-span-3">
-                    <label class="block text-xs font-bold text-gray-500 mb-1">CENA</label>
-                    <input type="tel" id="pPrice" placeholder="0" class="w-full p-3 border-2 border-gray-200 rounded-lg focus:border-black focus:outline-none font-bold text-lg">
-                </div>
-                <div class="col-span-6 sm:col-span-3">
-                    <label class="block text-xs font-bold text-gray-500 mb-1">KOD (OPCJA)</label>
-                    <input type="tel" id="pCode" placeholder="0" class="w-full p-3 border-2 border-gray-200 rounded-lg focus:border-black focus:outline-none text-sm">
-                </div>
-                <div class="col-span-12 sm:col-span-1">
-                    <button type="button" id="addBtn" onclick="addItem()" class="w-full bg-black text-yellow-400 h-[50px] rounded-lg flex items-center justify-center hover:bg-gray-800 shadow-lg active:scale-95 text-2xl font-bold cursor-pointer">
-                        +
-                    </button>
-                </div>
-            </div>
+    <div id="product-list">
         </div>
 
-        <div id="listContainer" class="space-y-3">
-            <div class="text-center py-10 text-gray-400 bg-white rounded-xl border-2 border-dashed border-gray-300">
-                <p>Lista pusta. Dodaj produkt.</p>
-            </div>
-        </div>
+    <button class="btn-add" onclick="addProduct()">+ Dodaj kolejny produkt</button>
+    <button class="btn-calc" onclick="calculate()">Oblicz najtańszą opcję</button>
 
-    </main>
-
-    <div class="fixed bottom-0 left-0 right-0 bg-neutral-900 text-white border-t-4 border-yellow-400 p-4 z-40 shadow-[0_-5px_20px_rgba(0,0,0,0.3)]">
-        <div class="max-w-2xl mx-auto">
-            <div class="flex justify-between items-center mb-2">
-                 <div id="promoText" class="text-xs font-bold px-2 py-1 rounded bg-gray-700 text-gray-300">BRAK RABATU</div>
-                 <div class="text-xs text-gray-400">Multi: <span id="countMulti" class="text-white font-bold">0</span></div>
-            </div>
-            <div class="flex justify-between items-end">
-                <div>
-                    <div class="text-gray-500 text-[10px] uppercase font-bold">DO ZAPŁATY</div>
-                    <div id="totalPay" class="text-3xl font-black text-yellow-400 leading-none">0.00 zł</div>
-                </div>
-                <div class="text-right">
-                    <div class="text-gray-500 text-[10px] uppercase font-bold">ZYSK</div>
-                    <div id="totalSave" class="text-xl font-bold leading-none text-white">0.00 zł</div>
-                </div>
-            </div>
+    <div id="results" class="results">
+        <div class="summary-card">
+            <div>Najlepsza całkowita cena:</div>
+            <div class="summary-price" id="res-total">0,00 zł</div>
+            <div class="saving" id="res-saving">Oszczędzasz: 0,00 zł</div>
         </div>
+        <div id="res-groups"></div>
     </div>
-
-    <script>
-        // --- DANE ---
-        // Trzymamy stan w prostej tablicy
-        var items = [];
-        var idCounter = 0; // Prosty licznik do generowania ID (1, 2, 3...)
-
-        // --- FUNKCJE POMOCNICZE ---
-        function cleanNumber(val) {
-            if (!val) return 0;
-            // Zamienia przecinki na kropki i usuwa spacje
-            var s = val.toString().replace(/,/g, '.').replace(/\s/g, '');
-            var n = parseFloat(s);
-            return isNaN(n) ? 0 : n;
-        }
-
-        // --- GŁÓWNA FUNKCJA DODAWANIA ---
-        function addItem() {
-            var nameIn = document.getElementById('pName');
-            var priceIn = document.getElementById('pPrice');
-            var codeIn = document.getElementById('pCode');
-            var panel = document.getElementById('inputPanel');
-
-            var price = cleanNumber(priceIn.value);
-            var code = cleanNumber(codeIn.value);
-            var name = nameIn.value.trim();
-
-            if (price <= 0) {
-                alert("Podaj cenę!");
-                return;
-            }
-
-            if (!name) name = "Produkt " + (items.length + 1);
-
-            idCounter++;
-            // Generujemy ID jako string, np. "item_1", bezpieczne dla HTML
-            var safeId = 'item_' + idCounter;
-
-            var newItem = {
-                id: safeId, 
-                name: name,
-                price: price,
-                code: code,
-                inMulti: (code === 0) // Domyślnie w multi, jeśli brak kodu
-            };
-
-            items.push(newItem);
-
-            // Efekt wizualny (flash)
-            panel.classList.remove('flash-green');
-            void panel.offsetWidth; // Trigger reflow
-            panel.classList.add('flash-green');
-
-            // Czyszczenie pól
-            nameIn.value = '';
-            priceIn.value = '';
-            codeIn.value = '';
-            nameIn.focus();
-
-            render();
-        }
-
-        // --- USUWANIE ---
-        function deleteItem(id) {
-            // Filtrujemy tablicę, zostawiamy wszystko co NIE ma tego ID
-            items = items.filter(function(x) { return x.id !== id; });
-            render();
-        }
-
-        // --- PRZEŁĄCZANIE MULTI/SOLO ---
-        function toggle(id) {
-            for (var i = 0; i < items.length; i++) {
-                if (items[i].id === id) {
-                    items[i].inMulti = !items[i].inMulti;
-                    break;
-                }
-            }
-            render();
-        }
-
-        // --- RENDEROWANIE (OBLICZENIA + HTML) ---
-        function render() {
-            var container = document.getElementById('listContainer');
-            
-            if (items.length === 0) {
-                container.innerHTML = '<div class="text-center py-10 text-gray-400 bg-white rounded-xl border-2 border-dashed border-gray-300"><p>Lista pusta.</p></div>';
-                updateFooter(0, 0, 0, "BRAK RABATU", "bg-gray-700 text-gray-300");
-                return;
-            }
-
-            // 1. Podział na grupy
-            var multiList = [];
-            var soloList = [];
-
-            for (var i=0; i<items.length; i++) {
-                if (items[i].inMulti) multiList.push(items[i]);
-                else soloList.push(items[i]);
-            }
-
-            // Sortowanie multi rosnąco
-            multiList.sort(function(a, b) { return a.price - b.price; });
-
-            // 2. Matematyka
-            var total = 0;
-            var regularSum = 0;
-            var discountedId = null; // Który przedmiot dostał zniżkę
-            
-            // Oblicz SOLO
-            for (var i=0; i<soloList.length; i++) {
-                regularSum += soloList[i].price;
-                var finalP = soloList[i].price;
-                if (soloList[i].code > 0) {
-                    finalP = soloList[i].price - soloList[i].code;
-                    if (finalP < 1) finalP = 1;
-                }
-                total += finalP;
-            }
-
-            // Oblicz MULTI
-            var count = multiList.length;
-            var promoLabel = "BRAK (min. 2)";
-            var promoColor = "bg-gray-700 text-gray-300";
-
-            for (var i=0; i<count; i++) regularSum += multiList[i].price;
-
-            if (count >= 2) {
-                var cheapest = multiList[0];
-                discountedId = cheapest.id;
-                
-                var newPrice = cheapest.price;
-
-                if (count === 2) {
-                    newPrice = cheapest.price * 0.70;
-                    promoLabel = "-30% (2 szt.)";
-                    promoColor = "bg-lime-600 text-white";
-                } else if (count === 3) {
-                    newPrice = cheapest.price * 0.45;
-                    promoLabel = "-55% (3 szt.)";
-                    promoColor = "bg-green-600 text-white";
-                } else if (count === 4) {
-                    newPrice = cheapest.price * 0.20;
-                    promoLabel = "-80% (4 szt.)";
-                    promoColor = "bg-orange-500 text-white";
-                } else if (count >= 5) {
-                    newPrice = 1.00;
-                    promoLabel = "ZA 1 ZŁ (5+ szt.)";
-                    promoColor = "bg-red-600 text-white";
-                }
-
-                // Suma grupy = suma wszystkich - cena starego + cena nowego
-                var groupBaseSum = 0;
-                for(var k=0; k<count; k++) groupBaseSum += multiList[k].price;
-                
-                total += (groupBaseSum - cheapest.price) + newPrice;
-
-            } else {
-                // Za mało sztuk w multi
-                for(var k=0; k<count; k++) total += multiList[k].price;
-            }
-
-            var saved = regularSum - total;
-
-            // 3. Budowanie HTML (Jeden duży string - najbezpieczniejsza metoda)
-            var html = '';
-            
-            // Odwracamy listę do wyświetlania (najnowsze na górze)
-            var displayItems = items.slice().reverse();
-
-            for (var i=0; i<displayItems.length; i++) {
-                var item = displayItems[i];
-                var isDiscounted = (item.id === discountedId);
-                
-                var finalPrice = item.price;
-                var gain = 0;
-                var styleClass = "border-gray-300"; // Szary pasek
-
-                if (item.inMulti) {
-                    if (isDiscounted) {
-                        // Obliczamy ile ten konkretny przedmiot kosztuje po rabacie
-                        if (count >= 5) finalPrice = 1;
-                        else if (count === 4) finalPrice = item.price * 0.20;
-                        else if (count === 3) finalPrice = item.price * 0.45;
-                        else if (count === 2) finalPrice = item.price * 0.70;
-                        
-                        gain = item.price - finalPrice;
-                        styleClass = "border-green-500 bg-green-50";
-                    } else {
-                        styleClass = "border-blue-500";
-                    }
-                } else {
-                    // Solo
-                    if (item.code > 0) {
-                        finalPrice = item.price - item.code;
-                        if (finalPrice < 1) finalPrice = 1;
-                        gain = item.code;
-                        styleClass = "border-purple-500 bg-purple-50";
-                    }
-                }
-
-                // Budujemy kartę produktu
-                html += '<div class="bg-white p-3 rounded shadow-sm flex justify-between items-center mb-2 border-l-4 ' + styleClass + '">';
-                
-                // LEWA: Info
-                html += '<div class="flex-1 pr-2">';
-                html +=   '<div class="font-bold truncate">' + item.name + '</div>';
-                
-                if (item.inMulti && isDiscounted) {
-                    html += '<span class="bg-green-600 text-white text-[10px] px-1 rounded font-bold uppercase">RABAT</span> ';
-                }
-                if (!item.inMulti && item.code > 0) {
-                    html += '<span class="bg-purple-600 text-white text-[10px] px-1 rounded font-bold uppercase">KOD -' + item.code + '</span> ';
-                }
-
-                html +=   '<div class="flex items-baseline gap-2 mt-1">';
-                html +=     '<span class="font-black text-lg">' + finalPrice.toFixed(2) + ' zł</span>';
-                if (gain > 0) {
-                    html += '<span class="text-xs text-gray-400 line-through">' + item.price.toFixed(2) + '</span>';
-                }
-                html +=   '</div>';
-                html += '</div>'; // koniec lewej
-
-                // PRAWA: Przyciski
-                html += '<div class="flex flex-col items-end gap-2">';
-                
-                // Przycisk Toggle
-                var bgT = item.inMulti ? 'bg-blue-600' : 'bg-gray-300';
-                var posT = item.inMulti ? 'translate-x-8' : 'translate-x-1';
-                var txtT = item.inMulti ? 'MULTI' : 'SOLO';
-                // Używamy cudzysłowów pojedynczych dla JS wewnątrz HTML - to kluczowe!
-                html += '<button onclick="toggle(\'' + item.id + '\')" class="relative h-7 w-14 rounded-full transition-colors ' + bgT + '">';
-                html +=   '<span class="absolute top-1 left-0 h-5 w-5 rounded-full bg-white transition-transform ' + posT + '"></span>';
-                html +=   '<span class="absolute top-1.5 right-0 left-0 text-[9px] text-white font-bold text-center">' + txtT + '</span>';
-                html += '</button>';
-
-                // Przycisk Usuń
-                html += '<button onclick="deleteItem(\'' + item.id + '\')" class="text-gray-300 hover:text-red-600 font-bold px-2">✕</button>';
-                
-                html += '</div>'; // koniec prawej
-                html += '</div>'; // koniec karty
-            }
-
-            container.innerHTML = html;
-            updateFooter(total, saved, count, promoLabel, promoColor);
-        }
-
-        function updateFooter(total, saved, count, label, color) {
-            document.getElementById('totalPay').innerText = total.toFixed(2) + " zł";
-            document.getElementById('totalSave').innerText = saved.toFixed(2) + " zł";
-            
-            var saveEl = document.getElementById('totalSave');
-            if (saved > 0) saveEl.className = "text-xl font-bold leading-none text-green-400";
-            else saveEl.className = "text-xl font-bold leading-none text-white";
-
-            document.getElementById('countMulti').innerText = count;
-            
-            var badge = document.getElementById('promoText');
-            badge.innerText = label;
-            badge.className = "text-xs font-bold px-2 py-1 rounded transition-colors " + color;
-        }
-
-        // Obsługa Enter w polach
-        var inputs = document.querySelectorAll('input');
-        inputs.forEach(function(inp) {
-            inp.addEventListener('keypress', function(e) {
-                if (e.key === 'Enter') {
-                    e.preventDefault(); // Ważne: nie wysyłaj formularza
-                    addItem();
-                }
-            });
-        });
-
-        // Start
-        render();
-
-    </script>
-</body>
-</html>
-        </div>
-    </header>
-
-    <main class="max-w-2xl mx-auto p-4">
-        
-        <!-- FORMULARZ DODAWANIA -->
-        <div class="bg-white p-4 rounded-xl shadow-sm mb-6 border border-gray-200">
-            <div class="grid grid-cols-12 gap-3 items-end">
-                <div class="col-span-12 sm:col-span-5">
-                    <label class="block text-xs font-bold text-gray-500 mb-1">NAZWA (opcja)</label>
-                    <input type="text" id="pName" placeholder="np. Lodówka" class="w-full p-3 border-2 border-gray-200 rounded-lg focus:border-black focus:outline-none text-sm transition-colors">
-                </div>
-                <div class="col-span-6 sm:col-span-3">
-                    <label class="block text-xs font-bold text-gray-500 mb-1">CENA PÓŁKA</label>
-                    <input type="number" id="pPrice" placeholder="0 zł" class="w-full p-3 border-2 border-gray-200 rounded-lg focus:border-black focus:outline-none font-bold transition-colors">
-                </div>
-                <div class="col-span-6 sm:col-span-3">
-                    <label class="block text-xs font-bold text-gray-500 mb-1">KOD (PLN)</label>
-                    <input type="number" id="pCode" placeholder="0 zł" class="w-full p-3 border-2 border-gray-200 rounded-lg focus:border-black focus:outline-none text-sm transition-colors">
-                </div>
-                <div class="col-span-12 sm:col-span-1">
-                    <button onclick="addProduct()" class="w-full bg-black text-yellow-400 h-[48px] rounded-lg flex items-center justify-center hover:bg-gray-800 transition-colors shadow-lg active:scale-95">
-                        <!-- Plus Icon -->
-                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="M12 5v14"/></svg>
-                    </button>
-                </div>
-            </div>
-        </div>
-
-        <!-- LISTA PRODUKTÓW -->
-        <div id="productList" class="space-y-3 mb-24">
-            <!-- Tutaj JavaScript wstawi produkty -->
-            <div id="emptyState" class="text-center py-10 text-gray-400 bg-white rounded-xl border-2 border-dashed border-gray-300">
-                <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="mx-auto mb-2 opacity-20"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z"/><path d="M3 6h18"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
-                <p>Dodaj produkty, aby przeliczyć zestaw.</p>
-            </div>
-        </div>
-
-    </main>
-
-    <!-- FOOTER SUMMARY - STICKY BOTTOM -->
-    <div class="fixed bottom-0 left-0 right-0 bg-neutral-900 text-white border-t-4 border-yellow-400 p-4 shadow-[0_-4px_20px_rgba(0,0,0,0.3)] z-40">
-        <div class="max-w-2xl mx-auto">
-            
-            <!-- Pasek statusu promocji -->
-            <div class="flex justify-between items-center mb-3">
-                 <div id="promoBadge" class="text-[10px] sm:text-xs font-bold px-2 py-1 rounded bg-gray-700 text-gray-300 transition-colors">
-                   BRAK MULTIRABATU
-                 </div>
-                 <div class="text-xs text-gray-400">
-                   W puli Multi: <span id="multiCount" class="text-white font-bold">0</span> szt.
-                 </div>
-            </div>
-
-            <div class="flex justify-between items-end">
-                <div>
-                    <div class="text-gray-400 text-[10px] uppercase tracking-wide mb-1">Do zapłaty</div>
-                    <div id="finalTotal" class="text-3xl font-black text-yellow-400 leading-none">
-                        0.00 zł
-                    </div>
-                </div>
-
-                <div class="text-right">
-                    <div class="text-gray-400 text-[10px] uppercase tracking-wide mb-1">Zaoszczędzono</div>
-                    <div id="savedTotal" class="text-xl font-bold leading-none text-white">
-                        0.00 zł
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- JAVASCRIPT LOGIC -->
-    <script>
-        let products = [];
-
-        function addProduct() {
-            const nameInput = document.getElementById('pName');
-            const priceInput = document.getElementById('pPrice');
-            const codeInput = document.getElementById('pCode');
-
-            const name = nameInput.value.trim() || `Produkt ${products.length + 1}`;
-            const price = parseFloat(priceInput.value);
-            const code = parseFloat(codeInput.value) || 0;
-
-            if (!price || price <= 0) return;
-
-            // Logika: jeśli wpisano kod, domyślnie NIE wchodzi do multi. Jeśli brak kodu - wchodzi.
-            const inMultiDefault = (code === 0);
-
-            const newProduct = {
-                id: Date.now(),
-                name: name,
-                basePrice: price,
-                codeValue: code,
-                inMulti: inMultiDefault
-            };
-
-            products.push(newProduct);
-
-            // Reset pól
-            nameInput.value = '';
-            priceInput.value = '';
-            codeInput.value = '';
-            
-            render();
-        }
-
-        function removeProduct(id) {
-            products = products.filter(p => p.id !== id);
-            render();
-        }
-
-        function toggleMulti(id) {
-            const product = products.find(p => p.id === id);
-            if (product) {
-                product.inMulti = !product.inMulti;
-                render();
-            }
-        }
-
-        function render() {
-            const list = document.getElementById('productList');
-            const emptyState = document.getElementById('emptyState');
-
-            // Obliczenia
-            const multiGroup = products.filter(p => p.inMulti).sort((a, b) => a.basePrice - b.basePrice);
-            const soloGroup = products.filter(p => !p.inMulti);
-
-            let totalRegular = 0;
-            let totalFinal = 0;
-            let discountedId = null;
-            let promoText = "BRAK (min. 2 szt.)";
-            let promoColorClass = "bg-gray-700 text-gray-300";
-
-            // 1. SOLO
-            soloGroup.forEach(p => {
-                totalRegular += p.basePrice;
-                let final = p.basePrice;
-                if(p.codeValue > 0) final = Math.max(1, p.basePrice - p.codeValue);
-                totalFinal += final;
-            });
-
-            // 2. MULTI
-            multiGroup.forEach(p => totalRegular += p.basePrice);
-            const count = multiGroup.length;
-            
-            if (count >= 2) {
-                const cheapest = multiGroup[0];
-                discountedId = cheapest.id;
-                
-                let finalForCheapest = cheapest.basePrice;
-
-                if (count === 2) {
-                    finalForCheapest = cheapest.basePrice * 0.70;
-                    promoText = "2 SZT: -30% NA NAJTAŃSZY";
-                    promoColorClass = "bg-lime-500 text-white";
-                } else if (count === 3) {
-                    finalForCheapest = cheapest.basePrice * 0.45;
-                    promoText = "3 SZT: -55% NA NAJTAŃSZY";
-                    promoColorClass = "bg-green-600 text-white";
-                } else if (count === 4) {
-                    finalForCheapest = cheapest.basePrice * 0.20;
-                    promoText = "4 SZT: -80% NA NAJTAŃSZY";
-                    promoColorClass = "bg-orange-500 text-white";
-                } else if (count >= 5) {
-                    finalForCheapest = 1.00;
-                    promoText = "5+ SZT: NAJTAŃSZY ZA 1 ZŁ";
-                    promoColorClass = "bg-red-600 text-white";
-                }
-
-                // Suma grupy multi = (suma wszystkich - cena najtańszego) + nowa cena najtańszego
-                const groupSum = multiGroup.reduce((s, p) => s + p.basePrice, 0);
-                totalFinal += (groupSum - cheapest.basePrice) + finalForCheapest;
-
-            } else {
-                // Za mało do multi
-                multiGroup.forEach(p => totalFinal += p.basePrice);
-            }
-
-            const savedAmount = totalRegular - totalFinal;
-
-            // Renderowanie HTML
-            if (products.length === 0) {
-                list.innerHTML = '';
-                list.appendChild(emptyState);
-                emptyState.style.display = 'block';
-            } else {
-                emptyState.style.display = 'none';
-                list.innerHTML = '';
-
-                // Kopiujemy tablicę products żeby wyświetlać w kolejności dodania (lub odwróconej)
-                // Tutaj: odwrócona kolejność (najnowsze na górze)
-                const displayProducts = [...products].reverse();
-
-                displayProducts.forEach(p => {
-                    const isDiscounted = (p.id === discountedId);
-                    
-                    let finalDisplay = p.basePrice;
-                    let profit = 0;
-                    let styleClass = "border-l-4 border-gray-300"; // default
-
-                    if (p.inMulti) {
-                        if (isDiscounted) {
-                            // Oblicz cenę po rabacie dla tego itemu
-                            if (count >= 5) finalDisplay = 1;
-                            else if (count === 4) finalDisplay = p.basePrice * 0.2;
-                            else if (count === 3) finalDisplay = p.basePrice * 0.45;
-                            else if (count === 2) finalDisplay = p.basePrice * 0.7;
-                            
-                            profit = p.basePrice - finalDisplay;
-                            styleClass = "border-l-4 border-green-500 bg-green-50";
-                        } else {
-                            styleClass = "border-l-4 border-blue-500";
-                        }
-                    } else {
-                        if (p.codeValue > 0) {
-                            finalDisplay = Math.max(1, p.basePrice - p.codeValue);
-                            profit = p.codeValue;
-                            styleClass = "border-l-4 border-purple-500 bg-purple-50";
-                        }
-                    }
-
-                    const itemHTML = `
-                        <div class="bg-white p-4 rounded-lg shadow-sm flex items-center justify-between transition-all fade-in ${styleClass}">
-                            <div class="flex flex-col min-w-0 flex-1 pr-2">
-                                <div class="flex items-center gap-2 mb-1">
-                                    <span class="font-bold text-lg truncate">${p.name}</span>
-                                    ${p.inMulti && isDiscounted ? '<span class="bg-green-600 text-white text-[10px] px-1.5 py-0.5 rounded font-bold uppercase">Rabatowany</span>' : ''}
-                                    ${!p.inMulti && p.codeValue > 0 ? `<span class="bg-purple-600 text-white text-[10px] px-1.5 py-0.5 rounded font-bold uppercase">KOD -${p.codeValue}</span>` : ''}
-                                </div>
-                                <div class="flex items-baseline gap-2">
-                                    <span class="font-extrabold text-xl">${finalDisplay.toFixed(2)} zł</span>
-                                    ${profit > 0 ? `<span class="text-xs text-gray-400 line-through">${p.basePrice} zł</span>` : ''}
-                                </div>
-                                ${profit > 0 ? `<div class="text-xs font-bold text-green-600 mt-1">Zysk: ${profit.toFixed(2)} zł</div>` : ''}
-                            </div>
-
-                            <div class="flex flex-col items-end gap-3">
-                                <!-- Custom Toggle Button HTML -->
-                                <button onclick="toggleMulti(${p.id})" class="relative inline-flex h-7 w-16 items-center rounded-full transition-colors focus:outline-none ${p.inMulti ? 'bg-blue-600' : 'bg-gray-300'}">
-                                    <span class="inline-block h-5 w-5 transform rounded-full bg-white transition-transform ${p.inMulti ? 'translate-x-10' : 'translate-x-1'}"></span>
-                                    <span class="absolute text-[9px] font-bold text-white ${p.inMulti ? 'left-2' : 'right-2'}">
-                                        ${p.inMulti ? 'MULTI' : 'SOLO'}
-                                    </span>
-                                </button>
-
-                                <button onclick="removeProduct(${p.id})" class="text-gray-300 hover:text-red-500 p-1 transition-colors">
-                                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/></svg>
-                                </button>
-                            </div>
-                        </div>
-                    `;
-                    list.innerHTML += itemHTML;
-                });
-            }
-
-            // Update footer
-            document.getElementById('finalTotal').innerText = totalFinal.toFixed(2) + " zł";
-            document.getElementById('savedTotal').innerText = savedAmount.toFixed(2) + " zł";
-            
-            const savedEl = document.getElementById('savedTotal');
-            if (savedAmount > 0) savedEl.classList.replace('text-white', 'text-green-400');
-            else savedEl.classList.replace('text-green-400', 'text-white');
-
-            document.getElementById('multiCount').innerText = count;
-            const badge = document.getElementById('promoBadge');
-            badge.innerText = promoText;
-            badge.className = `text-[10px] sm:text-xs font-bold px-2 py-1 rounded transition-colors ${promoColorClass}`;
-        }
-
-        // Init
-        render();
-
-        // Obsługa entera w inputach
-        document.querySelectorAll('input').forEach(input => {
-            input.addEventListener('keypress', function (e) {
-                if (e.key === 'Enter') {
-                    addProduct();
-                }
-            });
-        });
-
-    </script>
-</body>
-</html>
-
-        multiPromoLabel = "3 SZT: -55% NA NAJTAŃSZY";
-        multiPromoColor = "bg-green-600 text-white";
-      } else if (count === 4) {
-        multiplier = 0.20; // -80%
-        multiPromoLabel = "4 SZT: -80% NA NAJTAŃSZY";
-        multiPromoColor = "bg-orange-500 text-white";
-      } else if (count >= 5) {
-        fixedPrice = 1.00; // 1 zł
-        multiPromoLabel = "5+ SZT: NAJTAŃSZY ZA 1 ZŁ";
-        multiPromoColor = "bg-red-600 text-white";
-      }
-
-      let priceAfterDiscount = cheapest.basePrice;
-      if (fixedPrice !== null) {
-        priceAfterDiscount = fixedPrice;
-      } else {
-        priceAfterDiscount = cheapest.basePrice * multiplier;
-      }
-
-      // Sumujemy ceny: (Suma całej grupy) - (Cena najtańszego) + (Cena po rabacie)
-      const groupSumBase = multiGroup.reduce((sum, p) => sum + p.basePrice, 0);
-      const groupSumFinal = (groupSumBase - cheapest.basePrice) + priceAfterDiscount;
-      
-      totalFinalPrice += groupSumFinal;
-      discountAmount = groupSumBase - groupSumFinal;
-
-    } else {
-      // Za mało produktów w multi, liczymy normalnie
-      multiGroup.forEach(p => totalFinalPrice += p.basePrice);
+</div>
+
+<script>
+    let products = [];
+    let nextId = 1;
+
+    // Funkcja parsująca floaty z obsługą przecinków i kropek (przelicza na grosze by unikać błędów JS)
+    function parsePrice(val) {
+        if(!val) return 0;
+        let parsed = parseFloat(val.toString().replace(/\s/g, '').replace(',', '.'));
+        if(isNaN(parsed) || parsed < 0) return 0;
+        return Math.round(parsed * 100); 
     }
 
-    return {
-      totalRegularPrice,
-      totalFinalPrice,
-      saved: totalRegularPrice - totalFinalPrice,
-      discountedId,
-      multiPromoLabel,
-      multiPromoColor,
-      multiCount: count
-    };
+    function formatPrice(grosze) {
+        return (grosze / 100).toFixed(2).replace('.', ',') + ' zł';
+    }
 
-  }, [products]);
+    function renderProducts() {
+        const list = document.getElementById('product-list');
+        list.innerHTML = '';
+        products.forEach((p, index) => {
+            const row = document.createElement('div');
+            row.className = 'product-row';
+            row.innerHTML = `
+                <div>
+                    <label>Nazwa (opcjonalnie)</label>
+                    <input type="text" placeholder="Produkt ${index + 1}" value="${p.name}" onchange="updateProduct(${p.id}, 'name', this.value)">
+                </div>
+                <div>
+                    <label>Cena wyjściowa (zł) *</label>
+                    <input type="number" step="0.01" min="0" placeholder="np. 2999.99" value="${p.basePrice || ''}" onchange="updateProduct(${p.id}, 'basePrice', this.value)">
+                </div>
+                <div>
+                    <label>Cena po kodzie (zł)</label>
+                    <input type="number" step="0.01" min="0" placeholder="np. 2899.99" value="${p.codePrice || ''}" onchange="updateProduct(${p.id}, 'codePrice', this.value)">
+                </div>
+                <button class="btn-remove" onclick="removeProduct(${p.id})">✖</button>
+            `;
+            list.appendChild(row);
+        });
+    }
 
-  return (
-    <div className="min-h-screen bg-gray-100 font-sans text-slate-800 pb-20">
-      {/* Header w stylu ME */}
-      <header className="bg-yellow-400 p-4 shadow-md border-b-4 border-black sticky top-0 z-10">
-        <div className="flex items-center justify-between max-w-2xl mx-auto">
-          <h1 className="text-xl font-black tracking-wider flex items-center gap-2">
-            <Calculator className="w-6 h-6" />
-            STRATEG ME
-          </h1>
-          <div className="text-xs font-bold bg-black text-yellow-400 px-2 py-1 rounded">
-            v2.1 PRO
-          </div>
-        </div>
-      </header>
+    function addProduct() {
+        products.push({ id: nextId++, name: '', basePrice: '', codePrice: '' });
+        renderProducts();
+    }
 
-      <main className="max-w-2xl mx-auto p-4">
-        
-        {/* Formularz dodawania */}
-        <div className="bg-white p-4 rounded-xl shadow-sm mb-6 border border-gray-200">
-          <div className="grid grid-cols-12 gap-3 items-end">
-            <div className="col-span-12 sm:col-span-5">
-              <label className="block text-xs font-bold text-gray-500 mb-1">NAZWA (opcja)</label>
-              <input 
-                type="text" 
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                placeholder="np. Lodówka"
-                className="w-full p-3 border-2 border-gray-200 rounded-lg focus:border-black focus:outline-none text-sm"
-              />
-            </div>
-            <div className="col-span-6 sm:col-span-3">
-              <label className="block text-xs font-bold text-gray-500 mb-1">CENA PÓŁKA</label>
-              <input 
-                type="number" 
-                value={price}
-                onChange={(e) => setPrice(e.target.value)}
-                placeholder="0 zł"
-                className="w-full p-3 border-2 border-gray-200 rounded-lg focus:border-black focus:outline-none font-bold"
-              />
-            </div>
-            <div className="col-span-6 sm:col-span-3">
-              <label className="block text-xs font-bold text-gray-500 mb-1">KOD (PLN)</label>
-              <input 
-                type="number" 
-                value={codeDiscount}
-                onChange={(e) => setCodeDiscount(e.target.value)}
-                placeholder="0 zł"
-                className="w-full p-3 border-2 border-gray-200 rounded-lg focus:border-black focus:outline-none text-sm"
-              />
-            </div>
-            <div className="col-span-12 sm:col-span-1">
-              <button 
-                onClick={addProduct}
-                className="w-full bg-black text-yellow-400 h-[46px] rounded-lg flex items-center justify-center hover:bg-gray-800 transition-colors shadow-lg active:scale-95"
-              >
-                <Plus className="w-6 h-6" />
-              </button>
-            </div>
-          </div>
-        </div>
+    function removeProduct(id) {
+        products = products.filter(p => p.id !== id);
+        renderProducts();
+    }
 
-        {/* Lista produktów */}
-        <div className="space-y-3 mb-24">
-          {products.length === 0 && (
-            <div className="text-center py-10 text-gray-400 bg-white rounded-xl border border-dashed border-gray-300">
-              <ShoppingBag className="w-12 h-12 mx-auto mb-2 opacity-20" />
-              <p>Dodaj produkty, aby przeliczyć zestaw.</p>
-            </div>
-          )}
+    function updateProduct(id, field, value) {
+        const product = products.find(p => p.id === id);
+        if(product) {
+            product[field] = value;
+        }
+    }
 
-          {products.map((p) => {
-            const isDiscountedInMulti = p.id === calculations.discountedId;
-            
-            // Obliczanie ceny wyświetlanej na karcie
-            let finalDisplayPrice = p.basePrice;
-            let savingsDisplay = 0;
-            let statusColor = "border-l-4 border-gray-300"; // Default Solo without code
+    // Funkcja obliczająca cenę pakietu multi-rabatowego
+    function getBundleCost(bundle) {
+        let len = bundle.length;
+        if (len === 0) return { cost: 0, discount: 0 };
+        if (len === 1) return { cost: bundle[0].basePriceGrosze, discount: 0 }; 
 
-            if (p.inMulti) {
-              if (isDiscountedInMulti) {
-                // To jest ten szczęśliwy produkt
-                if (calculations.multiCount >= 5) finalDisplayPrice = 1;
-                else if (calculations.multiCount === 4) finalDisplayPrice = p.basePrice * 0.2;
-                else if (calculations.multiCount === 3) finalDisplayPrice = p.basePrice * 0.45;
-                else if (calculations.multiCount === 2) finalDisplayPrice = p.basePrice * 0.7;
-                
-                savingsDisplay = p.basePrice - finalDisplayPrice;
-                statusColor = "border-l-4 border-green-500 bg-green-50";
-              } else {
-                // W multi, ale nie najtańszy
-                statusColor = "border-l-4 border-blue-500";
-              }
-            } else {
-              // Solo
-              if (p.codeValue > 0) {
-                finalDisplayPrice = Math.max(1, p.basePrice - p.codeValue);
-                savingsDisplay = p.codeValue;
-                statusColor = "border-l-4 border-purple-500 bg-purple-50";
-              }
+        let sum = 0;
+        let minPrice = Infinity;
+
+        for (let p of bundle) {
+            sum += p.basePriceGrosze;
+            if (p.basePriceGrosze < minPrice) minPrice = p.basePriceGrosze;
+        }
+
+        let discount = 0;
+        if (len === 2) discount = Math.round(minPrice * 0.30);
+        else if (len === 3) discount = Math.round(minPrice * 0.55);
+        else if (len === 4) discount = Math.round(minPrice * 0.80);
+        else if (len >= 5) discount = minPrice - 100; // 1 zł za najtańszy
+
+        return {
+            cost: sum - discount,
+            discount: discount
+        };
+    }
+
+    function calculate() {
+        let n = products.length;
+        if (n === 0) {
+            alert("Dodaj minimum jeden produkt.");
+            return;
+        }
+        if (n > 12) {
+            alert("Maksymalna liczba produktów do optymalizacji to 12.");
+            return;
+        }
+
+        // Przygotowanie danych (weryfikacja wejść)
+        let parsedProducts = products.map((p, index) => {
+            let base = parsePrice(p.basePrice);
+            let code = parsePrice(p.codePrice);
+            if(base === 0) {
+                alert(`Produkt ${index + 1} musi mieć podaną cenę wyjściową > 0.`);
+                throw new Error("Błąd formularza");
+            }
+            return {
+                originalName: p.name || `Produkt ${index + 1}`,
+                basePriceGrosze: base,
+                bestIndivGrosze: (code > 0 && code < base) ? code : base,
+                usedCode: (code > 0 && code < base)
+            };
+        });
+
+        let bestCost = Infinity;
+        let bestAssignment = null;
+        let totalCombos = Math.pow(3, n);
+
+        // Brute-force wszystkich kombinacji:
+        // Każdy produkt może wylądować w: 0 = Osobno (najlepsza z base/code), 1 = Koszyk Multi 1, 2 = Koszyk Multi 2
+        for (let i = 0; i < totalCombos; i++) {
+            let temp = i;
+            let ind = [];
+            let b1 = [];
+            let b2 = [];
+            let currentCost = 0;
+
+            for (let p = 0; p < n; p++) {
+                let state = temp % 3;
+                temp = Math.floor(temp / 3);
+
+                if (state === 0) {
+                    ind.push(parsedProducts[p]);
+                    currentCost += parsedProducts[p].bestIndivGrosze;
+                } else if (state === 1) {
+                    b1.push(parsedProducts[p]);
+                } else {
+                    b2.push(parsedProducts[p]);
+                }
             }
 
-            return (
-              <div key={p.id} className={`bg-white p-4 rounded-lg shadow-sm flex items-center justify-between transition-all ${statusColor}`}>
-                
-                {/* Lewa strona: Info */}
-                <div className="flex flex-col min-w-0 flex-1 pr-2">
-                  <div className="flex items-center gap-2 mb-1">
-                    <span className="font-bold text-lg truncate">{p.name}</span>
-                    {p.inMulti && isDiscountedInMulti && (
-                      <span className="bg-green-600 text-white text-[10px] px-1.5 py-0.5 rounded font-bold uppercase">Rabatowany</span>
-                    )}
-                    {!p.inMulti && p.codeValue > 0 && (
-                      <span className="bg-purple-600 text-white text-[10px] px-1.5 py-0.5 rounded font-bold uppercase">KOD -{p.codeValue}</span>
-                    )}
-                  </div>
-                  
-                  <div className="flex items-baseline gap-2">
-                     <span className="font-extrabold text-xl">{finalDisplayPrice.toFixed(2)} zł</span>
-                     {savingsDisplay > 0 && (
-                       <span className="text-xs text-gray-400 line-through">{p.basePrice} zł</span>
-                     )}
-                  </div>
-                  {savingsDisplay > 0 && (
-                    <div className="text-xs font-bold text-green-600 mt-1">
-                      Zysk: {savingsDisplay.toFixed(2)} zł
-                    </div>
-                  )}
-                </div>
+            let resB1 = getBundleCost(b1);
+            let resB2 = getBundleCost(b2);
+            currentCost += resB1.cost + resB2.cost;
 
-                {/* Prawa strona: Kontrolki */}
-                <div className="flex flex-col items-end gap-3">
-                  
-                  {/* Toggle */}
-                  <button 
-                    onClick={() => toggleMulti(p.id)}
-                    className={`relative inline-flex h-7 w-16 items-center rounded-full transition-colors focus:outline-none ${p.inMulti ? 'bg-blue-600' : 'bg-gray-300'}`}
-                  >
-                     <span className={`inline-block h-5 w-5 transform rounded-full bg-white transition-transform ${p.inMulti ? 'translate-x-10' : 'translate-x-1'}`} />
-                     <span className={`absolute text-[9px] font-bold text-white ${p.inMulti ? 'left-2' : 'right-2'}`}>
-                       {p.inMulti ? 'MULTI' : 'SOLO'}
-                     </span>
-                  </button>
+            if (currentCost < bestCost) {
+                bestCost = currentCost;
+                bestAssignment = { 
+                    ind: ind, 
+                    b1: b1, b1_res: resB1,
+                    b2: b2, b2_res: resB2
+                };
+            }
+        }
 
-                  <button onClick={() => removeProduct(p.id)} className="text-gray-300 hover:text-red-500 p-1">
-                    <Trash2 className="w-5 h-5" />
-                  </button>
-                </div>
-              </div>
-            );
-          })}
-        </div>
-      </main>
+        displayResults(bestAssignment, bestCost, parsedProducts);
+    }
 
-      {/* Footer Summary Panel - Sticky Bottom */}
-      <div className="fixed bottom-0 left-0 right-0 bg-neutral-900 text-white border-t-4 border-yellow-400 p-4 shadow-[0_-4px_20px_rgba(0,0,0,0.2)]">
-        <div className="max-w-2xl mx-auto">
-          
-          {/* Status Pasek */}
-          <div className="flex justify-between items-center mb-3">
-             <div className={`text-xs font-bold px-2 py-1 rounded ${calculations.multiPromoColor}`}>
-               {calculations.multiPromoLabel}
-             </div>
-             <div className="text-xs text-gray-400">
-               W puli Multi: <span className="text-white font-bold">{calculations.multiCount}</span> szt.
-             </div>
-          </div>
+    function displayResults(assignment, bestCostGrosze, parsedProducts) {
+        const resDiv = document.getElementById('results');
+        const groupsDiv = document.getElementById('res-groups');
+        
+        let sumWithoutPromos = 0;
+        parsedProducts.forEach(p => { sumWithoutPromos += p.basePriceGrosze; });
+        let savings = sumWithoutPromos - bestCostGrosze;
 
-          <div className="flex justify-between items-end">
-            <div>
-              <div className="text-gray-400 text-xs uppercase tracking-wide mb-1">Do zapłaty</div>
-              <div className="text-3xl font-black text-yellow-400 leading-none">
-                {calculations.totalFinalPrice.toFixed(2)} zł
-              </div>
+        document.getElementById('res-total').innerText = formatPrice(bestCostGrosze);
+        document.getElementById('res-saving').innerText = `Oszczędzasz względem cen wyjściowych: ${formatPrice(savings)}`;
+
+        groupsDiv.innerHTML = '';
+
+        // KOSZYK 1: MULTI-RABAT
+        if (assignment.b1.length > 0) {
+            groupsDiv.appendChild(createGroupCard('📦 ZAMÓWIENIE 1 (Multi-Rabat)', assignment.b1, assignment.b1_res.cost, assignment.b1_res.discount));
+        }
+
+        // KOSZYK 2: MULTI-RABAT
+        if (assignment.b2.length > 0) {
+            groupsDiv.appendChild(createGroupCard('📦 ZAMÓWIENIE 2 (Multi-Rabat)', assignment.b2, assignment.b2_res.cost, assignment.b2_res.discount));
+        }
+
+        // KOSZYK 3: OSOBNO LUB Z KODAMI
+        if (assignment.ind.length > 0) {
+            let indCard = document.createElement('div');
+            indCard.className = 'group-card';
+            let indTitle = `<div class="group-title">🛒 Produkty z kodem dedykowanym lub kupowane osobno bez promocji</div>`;
+            let itemsHtml = assignment.ind.map(p => {
+                let badge = p.usedCode ? ' <span style="background:var(--success); color:white; padding:2px 6px; border-radius:4px; font-size:0.75rem;">Użyto kodu</span>' : '';
+                return `<div class="group-item">
+                    <span>${p.originalName}${badge}</span>
+                    <span>${formatPrice(p.bestIndivGrosze)}</span>
+                </div>`;
+            }).join('');
+            
+            indCard.innerHTML = indTitle + itemsHtml;
+            groupsDiv.appendChild(indCard);
+        }
+
+        resDiv.style.display = 'block';
+        resDiv.scrollIntoView({ behavior: "smooth" });
+    }
+
+    function createGroupCard(title, products, totalCostGrosze, discountGrosze) {
+        let card = document.createElement('div');
+        card.className = 'group-card';
+
+        let itemsHtml = products.map(p => `
+            <div class="group-item">
+                <span>${p.originalName}</span>
+                <span>${formatPrice(p.basePriceGrosze)}</span>
             </div>
+        `).join('');
 
-            <div className="text-right">
-              <div className="text-gray-400 text-xs uppercase tracking-wide mb-1">Zaoszczędzono</div>
-              <div className={`text-xl font-bold leading-none ${calculations.saved > 0 ? 'text-green-400' : 'text-white'}`}>
-                {calculations.saved.toFixed(2)} zł
-              </div>
+        let rabatHtml = discountGrosze > 0 
+            ? `<div class="rabat-info">Przyznany Multi-Rabat: -${formatPrice(discountGrosze)}</div>` 
+            : `<div class="rabat-info" style="color:var(--text-muted)">Brak rabatu (wymagane min. 2 produkty w koszyku)</div>`;
+
+        card.innerHTML = `
+            <div class="group-title">
+                <span>${title}</span>
+                <span style="color:var(--success)">Suma: ${formatPrice(totalCostGrosze)}</span>
             </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-};
+            ${itemsHtml}
+            ${rabatHtml}
+        `;
+        return card;
+    }
 
-export default App;
+    // Inicjalizacja z dwoma pustymi polami na start
+    addProduct();
+    addProduct();
+</script>
 
+</body>
+</html>
