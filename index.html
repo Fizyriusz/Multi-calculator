@@ -3,10 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Kalkulator Multi-Rabat ME PRO</title>
+    <title>Kalkulator Zestawów ME PRO</title>
     <style>
         :root {
-            /* Jasny motyw (domyślny) */
             --me-yellow: #ffe600;
             --me-yellow-hover: #e5cf00;
             --me-dark: #1a1a1a;
@@ -23,7 +22,6 @@
         }
 
         body.dark-mode {
-            /* Ciemny motyw */
             --bg: #121212;
             --card: #1e1e1e;
             --border: #374151;
@@ -36,46 +34,15 @@
             --me-yellow-hover: #e5bc00;
         }
 
-        body {
-            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-            background-color: var(--bg);
-            color: var(--text-main);
-            margin: 0;
-            padding: 20px;
-            transition: background-color 0.3s, color 0.3s;
-        }
-
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            background: var(--card);
-            padding: 30px;
-            border-radius: 12px;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
-            transition: background-color 0.3s;
-        }
-
-        header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            border-bottom: 4px solid var(--me-yellow);
-            margin-bottom: 20px;
-            padding-bottom: 15px;
-        }
-
+        body { font-family: 'Segoe UI', Roboto, Arial, sans-serif; background: var(--bg); color: var(--text-main); margin: 0; padding: 20px; transition: 0.3s; }
+        .container { max-width: 1200px; margin: 0 auto; background: var(--card); padding: 30px; border-radius: 12px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); }
+        
+        header { display: flex; justify-content: space-between; align-items: center; border-bottom: 4px solid var(--me-yellow); margin-bottom: 20px; padding-bottom: 15px; }
         h1 { margin: 0; font-size: 1.8rem; text-transform: uppercase; color: var(--text-main); }
-
         .header-actions { display: flex; gap: 10px; }
 
         .product-table { width: 100%; border-collapse: collapse; margin-bottom: 20px; }
-        
-        .product-table th {
-            text-align: left; background: var(--table-header); padding: 12px;
-            font-size: 0.85rem; color: var(--text-muted); text-transform: uppercase;
-            border-bottom: 2px solid var(--border);
-        }
-
+        .product-table th { text-align: left; background: var(--table-header); padding: 12px; font-size: 0.85rem; color: var(--text-muted); text-transform: uppercase; border-bottom: 2px solid var(--border); }
         .product-row { transition: background-color 0.2s; }
         .product-row.drag-over { border-top: 2px dashed var(--me-yellow); }
         .product-row td { padding: 10px; border-bottom: 1px solid var(--border); }
@@ -84,88 +51,66 @@
         .drag-handle { cursor: grab; color: var(--text-muted); font-size: 1.2rem; text-align: center; width: 30px; }
         .drag-handle:active { cursor: grabbing; }
 
-        input[type="text"], input[type="number"] {
-            width: 100%; padding: 10px; border: 1px solid var(--border);
-            border-radius: 6px; box-sizing: border-box; font-size: 1rem;
-            background-color: var(--input-bg); color: var(--text-main);
+        input[type="text"], input[type="number"], select {
+            width: 100%; padding: 10px; border: 1px solid var(--border); border-radius: 6px; box-sizing: border-box; font-size: 0.95rem; background-color: var(--input-bg); color: var(--text-main);
         }
-
         .checkbox-cell { text-align: center; }
         .checkbox-cell input { width: 20px; height: 20px; cursor: pointer; }
 
         .actions { display: flex; gap: 10px; margin-bottom: 30px; flex-wrap: wrap; }
+        button { padding: 12px 20px; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; transition: 0.2s; font-size: 1rem; }
         
-        button {
-            padding: 12px 20px; border: none; border-radius: 6px;
-            font-weight: bold; cursor: pointer; transition: all 0.2s; font-size: 1rem;
-        }
-
         .btn-add { background: var(--table-header); color: var(--text-main); border: 1px solid var(--border); }
-        .btn-add:hover { filter: brightness(0.9); }
         .btn-clear { background: #fee2e2; color: var(--danger); }
-        .btn-clear:hover { background: #fecaca; }
         .btn-theme { background: var(--me-dark); color: #fff; }
-        .btn-theme:hover { background: #000; }
-        .btn-print { background: #e0f2fe; color: #0284c7; }
-        .btn-print:hover { background: #bae6fd; }
-
-        .btn-calc { 
-            background: var(--me-yellow); color: #000; flex-grow: 1; 
-            font-size: 1.2rem; text-transform: uppercase;
-        }
+        .btn-print-formal { background: #e0f2fe; color: #0284c7; }
+        .btn-print-simple { background: #f1f5f9; color: #475569; border: 1px solid #cbd5e1; }
+        .btn-calc { background: var(--me-yellow); color: #000; flex-grow: 1; font-size: 1.2rem; text-transform: uppercase; }
         .btn-calc:hover { background: var(--me-yellow-hover); }
 
         .results { display: none; margin-top: 30px; animation: fadeIn 0.5s; }
-
-        .summary-box {
-            background: var(--me-dark); color: #fff; padding: 25px;
-            border-radius: 12px; text-align: center; margin-bottom: 30px;
-        }
-
+        .summary-box { background: var(--me-dark); color: #fff; padding: 25px; border-radius: 12px; text-align: center; margin-bottom: 30px; }
         .summary-price { font-size: 3rem; color: var(--me-yellow); font-weight: 800; }
-
         .grid-results { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; }
 
-        .order-card { background: var(--card); border: 2px solid var(--border); border-radius: 10px; padding: 20px; }
-        .order-card h3 { 
-            margin-top: 0; border-bottom: 2px solid var(--me-yellow); padding-bottom: 10px;
-            display: flex; justify-content: space-between; color: var(--text-main);
-        }
-
-        .item-list { list-style: none; padding: 0; margin: 0; }
-        .item-list li {
-            display: flex; justify-content: space-between; padding: 8px 0;
-            border-bottom: 1px solid var(--border); color: var(--text-main); align-items: center;
-        }
-
-        .discount-badge {
-            background: #dcfce7; color: #166534; padding: 4px 8px;
-            border-radius: 4px; font-size: 0.8rem; font-weight: bold;
-        }
-        .index-badge {
-            font-size: 0.75rem; color: var(--text-muted); background: var(--bg);
-            padding: 2px 6px; border-radius: 4px; border: 1px solid var(--border);
-            margin-left: 8px;
-        }
-
-        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        .order-card { background: var(--card); border: 2px solid var(--border); border-radius: 10px; padding: 20px; position: relative; }
+        .order-card h3 { margin-top: 0; border-bottom: 2px solid var(--me-yellow); padding-bottom: 10px; display: flex; justify-content: space-between; color: var(--text-main); font-size: 1.2rem; }
+        .order-card.loose-card h3 { border-bottom-color: var(--text-muted); }
+        .order-card.special-card h3 { border-bottom-color: #3b82f6; }
         
+        .explain-text { font-size: 0.85rem; color: var(--text-muted); margin-top: -5px; margin-bottom: 15px; font-style: italic; }
+        
+        .item-list { list-style: none; padding: 0; margin: 0; }
+        .item-list li { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid var(--border); color: var(--text-main); align-items: center; }
+
+        .discount-badge { background: #dcfce7; color: #166534; padding: 4px 8px; border-radius: 4px; font-size: 0.8rem; font-weight: bold; }
+        .index-badge { font-size: 0.75rem; color: var(--text-muted); background: var(--bg); padding: 2px 6px; border-radius: 4px; border: 1px solid var(--border); margin-left: 8px; font-family: monospace; }
         .loader { display: none; text-align: center; padding: 20px; font-weight: bold; color: var(--text-muted); }
 
-        /* ELEMENTY WIDOCZNE TYLKO DO DRUKU/PDF */
-        .print-header, .print-footer { display: none; }
-
         /* --- STYLE DO WYDRUKU PDF --- */
+        .print-header, .print-footer { display: none; }
         @media print {
             body { background: #fff !important; color: #000 !important; font-size: 12pt; padding: 0; }
             .container { box-shadow: none; border: none; padding: 0; max-width: 100%; }
             .no-print { display: none !important; }
-            .print-header { display: block; text-align: center; margin-bottom: 20px; border-bottom: 2px solid #000; padding-bottom: 10px; }
-            .print-footer { display: block; margin-top: 40px; font-size: 0.8rem; color: #555; text-align: justify; border-top: 1px solid #ccc; padding-top: 10px; }
-            .order-card { break-inside: avoid; border: 1px solid #000; margin-bottom: 20px; }
-            .summary-box { background: #f8f8f8 !important; color: #000 !important; border: 2px solid #000; }
+            
+            /* Domyślne ustawienia dla wydruku */
+            .order-card { break-inside: avoid; border: 1px solid #000; margin-bottom: 20px; padding: 15px; }
+            .summary-box { background: #f8f8f8 !important; color: #000 !important; border: 2px solid #000; padding: 15px; }
             .summary-price { color: #000 !important; }
             .discount-badge { border: 1px solid #000; background: transparent; color: #000; }
+            .explain-text { color: #444; }
+            .print-header { display: block; text-align: center; margin-bottom: 20px; padding-bottom: 10px; }
+            
+            /* Zależne od trybu druku (Oficjalny vs Prosty) */
+            body.print-formal .print-header { border-bottom: 2px solid #000; }
+            body.print-formal .print-footer { display: block; margin-top: 40px; font-size: 0.8rem; color: #555; text-align: justify; border-top: 1px solid #ccc; padding-top: 10px; }
+            
+            body.print-simple .print-footer { display: none !important; }
+            body.print-simple .explain-text { display: none !important; }
+            body.print-simple .order-card { border: none !important; border-bottom: 1px dashed #000 !important; padding: 10px 0 !important; }
+            body.print-simple .order-card h3 { border-bottom: none !important; font-size: 1.1rem !important; margin-bottom: 5px; }
+            body.print-simple .summary-box { border: none !important; border-top: 2px solid #000 !important; border-bottom: 2px solid #000 !important; }
         }
     </style>
 </head>
@@ -173,12 +118,12 @@
 
 <div class="container">
     <div class="print-header">
-        <h2>Wycena Zestawu - Media Expert</h2>
+        <h2 id="print-title">Wycena Zestawu - Media Expert</h2>
         <p id="print-date"></p>
     </div>
 
     <header class="no-print">
-        <h1>Optymalizator PRO</h1>
+        <h1>Optymalizator Zestawów</h1>
         <div class="header-actions">
             <button class="btn-theme" onclick="toggleTheme()">🌓 Motyw</button>
             <button class="btn-clear" onclick="clearData()">Wyczyść</button>
@@ -189,32 +134,34 @@
         <table class="product-table">
             <thead>
                 <tr>
-                    <th style="width: 30px;"></th> <th>Nazwa produktu</th>
-                    <th style="width: 15%;">Indeks</th>
-                    <th style="width: 15%;">Cena wyj. (zł)</th>
-                    <th style="width: 15%;">Po kodzie (zł)</th>
+                    <th style="width: 30px;"></th>
+                    <th>Nazwa produktu</th>
+                    <th style="width: 12%;">Indeks</th>
+                    <th style="width: 14%;">Typ (Promocje)</th>
+                    <th style="width: 12%;">Cena wyj. (zł)</th>
+                    <th style="width: 12%;">Po kodzie (zł)</th>
                     <th class="checkbox-cell" style="width: 10%;">Brak Multi</th>
-                    <th style="width: 50px;"></th>
+                    <th style="width: 40px;"></th>
                 </tr>
             </thead>
-            <tbody id="product-body">
-                </tbody>
+            <tbody id="product-body"></tbody>
         </table>
 
         <div class="actions">
             <button class="btn-add" onclick="addProduct()">+ Dodaj produkt</button>
-            <button class="btn-calc" onclick="runCalculation()">1. Oblicz najtańszą opcję</button>
-            <button class="btn-print" onclick="generatePDF()" id="btn-print" style="display:none;">2. Generuj PDF dla klienta</button>
+            <button class="btn-calc" onclick="runCalculation()">1. Przelicz Zestawy</button>
+            <button class="btn-print-formal btn-print-group" onclick="generatePDF('formal')" style="display:none;">2. Drukuj: Oficjalna Wycena</button>
+            <button class="btn-print-simple btn-print-group" onclick="generatePDF('simple')" style="display:none;">3. Drukuj: Szybka Lista</button>
         </div>
     </div>
 
-    <div id="loader" class="loader no-print">Analizowanie tysięcy kombinacji...</div>
+    <div id="loader" class="loader no-print">Przeszukiwanie milionów kombinacji rabatowych...</div>
 
     <div id="results" class="results">
         <div class="summary-box">
-            <div>Najlepsza cena łączna za cały zestaw:</div>
+            <div style="font-size: 1.2rem;">Najlepsza cena łączna za wszystkie produkty:</div>
             <div class="summary-price" id="total-price">0,00 zł</div>
-            <div style="color: var(--success); font-weight: bold;" id="total-savings"></div>
+            <div style="color: var(--success); font-weight: bold; font-size: 1.1rem;" id="total-savings"></div>
         </div>
         <div class="grid-results" id="order-grid"></div>
     </div>
@@ -225,249 +172,277 @@
 </div>
 
 <script>
-    // --- INICJALIZACJA I MOTYW ---
-    if(localStorage.getItem('theme') === 'dark') {
-        document.body.classList.add('dark-mode');
-    }
-
+    if(localStorage.getItem('theme') === 'dark') document.body.classList.add('dark-mode');
     function toggleTheme() {
         document.body.classList.toggle('dark-mode');
         localStorage.setItem('theme', document.body.classList.contains('dark-mode') ? 'dark' : 'light');
     }
 
-    // --- ZARZĄDZANIE DANYMI ---
-    let products = JSON.parse(localStorage.getItem('me_products_v2')) || [
-        { id: Date.now(), name: '', index: '', basePrice: '', codePrice: '', excluded: false }
+    let products = JSON.parse(localStorage.getItem('me_products_v3')) || [
+        { id: Date.now(), name: '', index: '', type: 'other', basePrice: '', codePrice: '', excluded: false }
     ];
 
-    function save() { localStorage.setItem('me_products_v2', JSON.stringify(products)); }
+    function save() { localStorage.setItem('me_products_v3', JSON.stringify(products)); }
 
-    // --- DRAG & DROP LOGIKA ---
+    // Drag & Drop
     let draggedIndex = null;
-
-    function handleDragStart(e, index) {
-        draggedIndex = index;
-        e.target.style.opacity = '0.5';
-    }
-    function handleDragEnd(e) {
-        e.target.style.opacity = '1';
-        document.querySelectorAll('.product-row').forEach(row => row.classList.remove('drag-over'));
-    }
-    function handleDragOver(e) {
-        e.preventDefault(); // Niezbędne by pozwolić na drop
-        e.currentTarget.classList.add('drag-over');
-    }
+    function handleDragStart(e, i) { draggedIndex = i; e.target.style.opacity = '0.5'; }
+    function handleDragEnd(e) { e.target.style.opacity = '1'; document.querySelectorAll('.product-row').forEach(r => r.classList.remove('drag-over')); }
+    function handleDragOver(e) { e.preventDefault(); e.currentTarget.classList.add('drag-over'); }
     function handleDragLeave(e) { e.currentTarget.classList.remove('drag-over'); }
-    
     function handleDrop(e, targetIndex) {
-        e.preventDefault();
-        e.currentTarget.classList.remove('drag-over');
-        
+        e.preventDefault(); e.currentTarget.classList.remove('drag-over');
         if(draggedIndex === null || draggedIndex === targetIndex) return;
-        
-        // Przestawienie elementu w tablicy
-        const itemToMove = products.splice(draggedIndex, 1)[0];
-        products.splice(targetIndex, 0, itemToMove);
-        
-        save();
-        render();
+        const item = products.splice(draggedIndex, 1)[0];
+        products.splice(targetIndex, 0, item);
+        save(); render();
     }
 
-    // --- RENDEROWANIE TABELI ---
     function render() {
         const body = document.getElementById('product-body');
         body.innerHTML = '';
-        products.forEach((p, arrayIdx) => {
+        products.forEach((p, idx) => {
             const tr = document.createElement('tr');
             tr.className = 'product-row';
             tr.draggable = true;
-            
-            // Eventy drag&drop
-            tr.addEventListener('dragstart', (e) => handleDragStart(e, arrayIdx));
+            tr.addEventListener('dragstart', (e) => handleDragStart(e, idx));
             tr.addEventListener('dragend', handleDragEnd);
             tr.addEventListener('dragover', handleDragOver);
             tr.addEventListener('dragleave', handleDragLeave);
-            tr.addEventListener('drop', (e) => handleDrop(e, arrayIdx));
+            tr.addEventListener('drop', (e) => handleDrop(e, idx));
 
             tr.innerHTML = `
-                <td class="drag-handle" title="Przeciągnij by zamienić kolejność">☰</td>
-                <td><input type="text" placeholder="np. Lodówka Samsung" value="${p.name}" oninput="update(${p.id}, 'name', this.value)"></td>
-                <td><input type="text" placeholder="np. 123456" value="${p.index || ''}" oninput="update(${p.id}, 'index', this.value)"></td>
+                <td class="drag-handle" title="Przeciągnij">☰</td>
+                <td><input type="text" placeholder="np. Lodówka" value="${p.name}" oninput="update(${p.id}, 'name', this.value)"></td>
+                <td><input type="text" placeholder="123456" value="${p.index || ''}" oninput="update(${p.id}, 'index', this.value)"></td>
+                <td>
+                    <select onchange="update(${p.id}, 'type', this.value)">
+                        <option value="other" ${p.type === 'other' || !p.type ? 'selected' : ''}>Standard</option>
+                        <option value="washer" ${p.type === 'washer' ? 'selected' : ''}>Pralka</option>
+                        <option value="dryer" ${p.type === 'dryer' ? 'selected' : ''}>Suszarka</option>
+                    </select>
+                </td>
                 <td><input type="number" step="0.01" placeholder="0.00" value="${p.basePrice}" oninput="update(${p.id}, 'basePrice', this.value)"></td>
                 <td><input type="number" step="0.01" placeholder="brak" value="${p.codePrice}" oninput="update(${p.id}, 'codePrice', this.value)"></td>
-                <td class="checkbox-cell"><input type="checkbox" ${p.excluded ? 'checked' : ''} onchange="update(${p.id}, 'excluded', this.checked)"></td>
+                <td class="checkbox-cell" title="Zaznacz, jeśli produkt nie łączy się w Multi-rabaty"><input type="checkbox" ${p.excluded ? 'checked' : ''} onchange="update(${p.id}, 'excluded', this.checked)"></td>
                 <td><button style="color:var(--danger); background:none; font-size:1.2rem; padding:5px;" onclick="remove(${p.id})">✖</button></td>
             `;
             body.appendChild(tr);
         });
     }
 
-    function addProduct() {
-        products.push({ id: Date.now(), name: '', index: '', basePrice: '', codePrice: '', excluded: false });
-        render(); save();
+    function addProduct() { products.push({ id: Date.now(), name: '', index: '', type: 'other', basePrice: '', codePrice: '', excluded: false }); render(); save(); }
+    function remove(id) { products = products.filter(p => p.id !== id); render(); save(); }
+    function update(id, field, value) { 
+        const p = products.find(p => p.id === id); 
+        if (p) p[field] = value; 
+        save(); hidePrintButtons();
     }
-
-    function remove(id) {
-        products = products.filter(p => p.id !== id);
-        render(); save();
-    }
-
-    function update(id, field, value) {
-        const p = products.find(p => p.id === id);
-        if (p) p[field] = value;
-        save();
-        document.getElementById('btn-print').style.display = 'none'; // Ukryj PDF jeśli zmieniono dane bez obliczenia
-    }
-
     function clearData() {
-        if(confirm("Czy na pewno chcesz wyczyścić wszystkie dane?")) {
-            products = [{ id: Date.now(), name: '', index: '', basePrice: '', codePrice: '', excluded: false }];
-            render(); save();
-            document.getElementById('results').style.display = 'none';
-            document.getElementById('btn-print').style.display = 'none';
+        if(confirm("Wyczyścić dane?")) {
+            products = [{ id: Date.now(), name: '', index: '', type: 'other', basePrice: '', codePrice: '', excluded: false }];
+            render(); save(); document.getElementById('results').style.display = 'none'; hidePrintButtons();
         }
     }
+    function hidePrintButtons() { document.querySelectorAll('.btn-print-group').forEach(b => b.style.display = 'none'); }
 
-    // --- ALGORYTM MATEMATYCZNY ---
+    // --- SZYBKI ALGORYTM ---
     function format(val) { return (val / 100).toFixed(2).replace('.', ',') + ' zł'; }
 
-    function getBundleCost(items) {
-        if (items.length === 0) return { total: 0, discount: 0 };
-        if (items.length === 1) return { total: items[0].baseGrosze, discount: 0 };
-
-        let sum = items.reduce((a, b) => a + b.baseGrosze, 0);
-        let min = Math.min(...items.map(i => i.baseGrosze));
-        let discount = 0;
-
-        if (items.length === 2) discount = Math.round(min * 0.30);
-        else if (items.length === 3) discount = Math.round(min * 0.55);
-        else if (items.length === 4) discount = Math.round(min * 0.80);
-        else if (items.length >= 5) discount = min - 100;
-
-        return { total: sum - discount, discount: discount };
-    }
-
     function runCalculation() {
-        const loader = document.getElementById('loader');
-        const results = document.getElementById('results');
-        
         const validProducts = products.filter(p => p.basePrice > 0).map(p => ({
-            name: p.name || "Produkt",
-            index: p.index || "",
+            name: p.name || "Produkt", index: p.index || "", type: p.type || "other",
             baseGrosze: Math.round(parseFloat(p.basePrice) * 100),
             codeGrosze: p.codePrice ? Math.round(parseFloat(p.codePrice) * 100) : null,
             excluded: p.excluded
         }));
-
         if (validProducts.length === 0) return alert("Wpisz ceny produktów!");
+        if (validProducts.length > 12) return alert("Zoptymalizowano dla max 12 produktów jednocześnie ze względu na limit kombinacji.");
 
-        loader.style.display = 'block';
-        results.style.display = 'none';
-        document.getElementById('btn-print').style.display = 'none';
+        document.getElementById('loader').style.display = 'block';
+        document.getElementById('results').style.display = 'none';
+        hidePrintButtons();
 
         setTimeout(() => {
-            const best = solve(validProducts);
+            const best = solveOptimized(validProducts);
             display(best, validProducts);
-            loader.style.display = 'none';
-            results.style.display = 'block';
-            document.getElementById('btn-print').style.display = 'block'; // Pokaż opcję PDF
+            document.getElementById('loader').style.display = 'none';
+            document.getElementById('results').style.display = 'block';
+            document.querySelectorAll('.btn-print-group').forEach(b => b.style.display = 'inline-block');
         }, 50);
     }
 
-    function solve(items) {
+    function solveOptimized(items) {
         const n = items.length;
         let bestTotal = Infinity;
-        let bestMap = null;
-        const states = 5;
+        let bestAssignment = null;
+        const states = 6; // 0:Luzem, 1-4:Multi, 5:Pralka+Suszarka
         const totalCombos = Math.pow(states, n);
+        let assignment = new Array(n);
 
         for (let i = 0; i < totalCombos; i++) {
             let current = i;
-            let currentTotal = 0;
-            let groups = [[], [], [], [], []];
             let possible = true;
-
+            
+            // Przetwarzanie stanów i szybkie odrzucanie błędnych kombinacji (Pruning)
             for (let j = 0; j < n; j++) {
-                let state = current % states;
+                let s = current % states;
                 current = Math.floor(current / states);
-                if (items[j].excluded && state > 0) { possible = false; break; }
-                groups[state].push(items[j]);
+                
+                if (items[j].excluded && s >= 1 && s <= 4) { possible = false; break; }
+                if (s === 5 && items[j].type === 'other') { possible = false; break; }
+                assignment[j] = s;
             }
-
             if (!possible) continue;
 
-            groups[0].forEach(item => {
-                currentTotal += (item.codeGrosze !== null && item.codeGrosze < item.baseGrosze) ? item.codeGrosze : item.baseGrosze;
-            });
+            // Obliczanie kosztu dla wariantu
+            let total = 0, cost5 = 0, washers = 0, dryers = 0;
+            let multiCosts = [0,0,0,0], multiMins = [Infinity,Infinity,Infinity,Infinity], multiCounts = [0,0,0,0];
 
-            let res = [getBundleCost(groups[1]), getBundleCost(groups[2]), getBundleCost(groups[3]), getBundleCost(groups[4])];
-            res.forEach(r => currentTotal += r.total);
+            for (let j = 0; j < n; j++) {
+                let s = assignment[j];
+                let it = items[j];
+                if (s === 0) {
+                    total += (it.codeGrosze !== null && it.codeGrosze < it.baseGrosze) ? it.codeGrosze : it.baseGrosze;
+                } else if (s >= 1 && s <= 4) {
+                    let k = s - 1;
+                    multiCosts[k] += it.baseGrosze;
+                    if (it.baseGrosze < multiMins[k]) multiMins[k] = it.baseGrosze;
+                    multiCounts[k]++;
+                } else if (s === 5) {
+                    if (it.type === 'washer') { washers++; cost5 += Math.round(it.baseGrosze * 0.5); }
+                    else if (it.type === 'dryer') { dryers++; cost5 += it.baseGrosze; }
+                }
+            }
 
-            if (currentTotal < bestTotal) { bestTotal = currentTotal; bestMap = { groups, res, bestTotal }; }
+            // Walidacja Promocji 50%
+            if (washers !== dryers) continue; 
+            total += cost5;
+
+            // Walidacja i zliczanie Multi-rabatów
+            for (let k = 0; k < 4; k++) {
+                if (multiCounts[k] === 0) continue;
+                if (multiCounts[k] === 1) { total += multiCosts[k]; } 
+                else {
+                    let c = multiCounts[k], min = multiMins[k], d = 0;
+                    if (c === 2) d = Math.round(min * 0.30);
+                    else if (c === 3) d = Math.round(min * 0.55);
+                    else if (c === 4) d = Math.round(min * 0.80);
+                    else if (c >= 5) d = min - 100;
+                    total += (multiCosts[k] - d);
+                }
+            }
+
+            if (total < bestTotal) {
+                bestTotal = total;
+                bestAssignment = [...assignment];
+            }
         }
-        return bestMap;
+
+        // Rekonstrukcja najlepszego wyniku do wyœwietlenia
+        let groups = [[], [], [], [], [], []];
+        if (bestAssignment) {
+            for(let j=0; j<n; j++) groups[bestAssignment[j]].push(items[j]);
+        }
+        return { groups, bestTotal };
+    }
+
+    function getBundleCost(items) {
+        if (items.length === 0) return { total: 0, discount: 0 };
+        if (items.length === 1) return { total: items[0].baseGrosze, discount: 0 };
+        let sum = items.reduce((a, b) => a + b.baseGrosze, 0);
+        let min = Math.min(...items.map(i => i.baseGrosze));
+        let discount = 0;
+        if (items.length === 2) discount = Math.round(min * 0.30);
+        else if (items.length === 3) discount = Math.round(min * 0.55);
+        else if (items.length === 4) discount = Math.round(min * 0.80);
+        else if (items.length >= 5) discount = min - 100;
+        return { total: sum - discount, discount: discount };
     }
 
     function display(best, allItems) {
         document.getElementById('total-price').innerText = format(best.bestTotal);
         let baseSum = allItems.reduce((a, b) => a + b.baseGrosze, 0);
-        document.getElementById('total-savings').innerText = "Łączna oszczędność klienta: " + format(baseSum - best.bestTotal);
+        document.getElementById('total-savings').innerText = "Klient zyskuje dzięki Tobie rabat: " + format(baseSum - best.bestTotal);
 
         const grid = document.getElementById('order-grid');
         grid.innerHTML = '';
 
+        // Render: MULTI-RABATY
         for (let i = 1; i <= 4; i++) {
             if (best.groups[i].length > 0) {
+                let res = getBundleCost(best.groups[i]);
                 const card = document.createElement('div');
                 card.className = 'order-card';
                 let itemsHtml = best.groups[i].map(item => `
-                    <li>
-                        <div>${item.name} ${item.index ? `<span class="index-badge">SKU: ${item.index}</span>` : ''}</div>
-                        <span>${format(item.baseGrosze)}</span>
-                    </li>
+                    <li><div>${item.name} ${item.index ? `<span class="index-badge">Indeks: ${item.index}</span>` : ''}</div> <span>${format(item.baseGrosze)}</span></li>
                 `).join('');
                 
                 card.innerHTML = `
-                    <h3>Zamówienie Multi #${i} <span style="color:var(--success)">${format(best.res[i-1].total)}</span></h3>
+                    <h3>🛒 Zestaw Multi-Rabat #${i} <span style="color:var(--success)">${format(res.total)}</span></h3>
+                    <p class="explain-text">Te produkty nabij wspólnie na jeden paragon (Promocja z rabatem na najtańszy).</p>
                     <ul class="item-list">${itemsHtml}</ul>
                     <div style="text-align:right; margin-top:10px;">
-                        <span class="discount-badge">Rabat z pakietu: -${format(best.res[i-1].discount)}</span>
+                        <span class="discount-badge" style="background:#fef3c7; color:#b45309">Rabat odliczony z najtańszego: -${format(res.discount)}</span>
                     </div>
                 `;
                 grid.appendChild(card);
             }
         }
 
-        if (best.groups[0].length > 0) {
+        // Render: PROMOCJA PRALKA+SUSZARKA
+        if (best.groups[5].length > 0) {
+            let cost5 = 0, discount5 = 0;
+            let itemsHtml = best.groups[5].map(it => {
+                let p = it.baseGrosze;
+                let usedPromo = false;
+                if(it.type === 'washer') { p = Math.round(it.baseGrosze * 0.5); usedPromo = true; cost5 += p; discount5 += p; } 
+                else { cost5 += p; }
+                return `<li><div>${it.name} ${it.index ? `<span class="index-badge">Indeks: ${it.index}</span>` : ''} ${usedPromo ? '<span class="discount-badge" style="background:#dbeafe; color:#1e40af; border:none; padding: 2px 5px;">-50% Taniej</span>' : ''}</div> <span>${format(p)}</span></li>`;
+            }).join('');
+
             const card = document.createElement('div');
-            card.className = 'order-card';
-            card.style.borderColor = 'var(--border)';
+            card.className = 'order-card special-card';
+            card.innerHTML = `
+                <h3>🧺 Zestaw Pralnictwo <span style="color:var(--success)">${format(cost5)}</span></h3>
+                <p class="explain-text">Produkty z dedykowanej promocji (Pralka 50% taniej przy zakupie z suszarką).</p>
+                <ul class="item-list">${itemsHtml}</ul>
+                <div style="text-align:right; margin-top:10px;"><span class="discount-badge" style="background:#dbeafe; color:#1e40af">Zysk na pralce: -${format(discount5)}</span></div>
+            `;
+            grid.appendChild(card);
+        }
+
+        // Render: KODY/LUZEM
+        if (best.groups[0].length > 0) {
+            let groupSum = 0;
             let itemsHtml = best.groups[0].map(item => {
                 let price = (item.codeGrosze !== null && item.codeGrosze < item.baseGrosze) ? item.codeGrosze : item.baseGrosze;
                 let usedCode = item.codeGrosze !== null && item.codeGrosze < item.baseGrosze;
-                return `<li>
-                    <div>${item.name} ${item.index ? `<span class="index-badge">SKU: ${item.index}</span>` : ''} ${usedCode ? '<span class="discount-badge" style="background:#e0f2fe; color:#0369a1; border:none;">KOD</span>' : ''}</div> 
-                    <span>${format(price)}</span>
-                </li>`;
+                groupSum += price;
+                return `<li><div>${item.name} ${item.index ? `<span class="index-badge">Indeks: ${item.index}</span>` : ''} ${usedCode ? '<span class="discount-badge" style="background:#e0f2fe; color:#0369a1; border:none; padding: 2px 5px;">UŻYTO KODU</span>' : ''}</div> <span>${format(price)}</span></li>`;
             }).join('');
 
-            let groupSum = best.groups[0].reduce((sum, item) => sum + ((item.codeGrosze !== null && item.codeGrosze < item.baseGrosze) ? item.codeGrosze : item.baseGrosze), 0);
-
+            const card = document.createElement('div');
+            card.className = 'order-card loose-card';
             card.innerHTML = `
-                <h3 style="border-bottom-color:var(--text-muted)">Pozostałe produkty <span>${format(groupSum)}</span></h3>
+                <h3>🎟️ Produkty Osobne / Kody <span>${format(groupSum)}</span></h3>
+                <p class="explain-text">Te produkty opłaca się nabić osobno na kody (lub bez promocji, bo Multi się tu nie kalkuluje).</p>
                 <ul class="item-list">${itemsHtml}</ul>
             `;
             grid.appendChild(card);
         }
     }
 
-    // --- FUNKCJA DRUKU / PDF ---
-    function generatePDF() {
-        const dateSpan = document.getElementById('print-date');
-        const now = new Date();
-        dateSpan.innerHTML = `Data sporządzenia wyceny: <strong>${now.toLocaleDateString('pl-PL')}</strong>, godz. <strong>${now.toLocaleTimeString('pl-PL', {hour: '2-digit', minute:'2-digit'})}</strong>`;
+    function generatePDF(mode) {
+        document.body.classList.remove('print-formal', 'print-simple');
+        document.body.classList.add('print-' + mode);
         
-        window.print(); // Otwiera systemowe okno drukowania z możliwością zapisu do PDF
+        document.getElementById('print-title').innerText = mode === 'formal' ? 'Wycena Zestawu - Media Expert' : 'Zestawienie Robocze';
+        
+        const now = new Date();
+        document.getElementById('print-date').innerHTML = `Data: <strong>${now.toLocaleDateString('pl-PL')}</strong>, godz. <strong>${now.toLocaleTimeString('pl-PL', {hour: '2-digit', minute:'2-digit'})}</strong>`;
+        
+        window.print();
     }
 
     render();
