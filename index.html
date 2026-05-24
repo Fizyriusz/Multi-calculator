@@ -2,293 +2,508 @@
 <html lang="pl">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>ME PRO - Optymalizator i Wizualizator</title>
-    <link rel="manifest" href="manifest.json">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kalkulator Zestawów ME PRO</title>
     <style>
         :root {
-            --me-yellow: #ffe600; --me-yellow-hover: #e5cf00; --me-dark: #1a1a1a;
-            --bg: #f0f2f5; --card: #ffffff; --border: #d1d5db; --text-main: #1a1a1a;
-            --text-muted: #64748b; --success: #10b981; --danger: #ef4444;
-            --input-bg: #ffffff; --table-header: #f8fafc; --row-hover: #f1f5f9;
+            --me-yellow: #ffe600;
+            --me-yellow-hover: #e5cf00;
+            --me-dark: #1a1a1a;
+            --bg: #f0f2f5;
+            --card: #ffffff;
+            --border: #d1d5db;
+            --text-main: #1a1a1a;
+            --text-muted: #64748b;
+            --success: #10b981;
+            --danger: #ef4444;
+            --input-bg: #ffffff;
+            --table-header: #f8fafc;
+            --row-hover: #f1f5f9;
         }
 
         body.dark-mode {
-            --bg: #121212; --card: #1e1e1e; --border: #374151; --text-main: #f3f4f6;
-            --text-muted: #9ca3af; --input-bg: #2d3748; --table-header: #2d3748;
-            --row-hover: #2d3748; --me-yellow: #cca600; --me-yellow-hover: #e5bc00;
+            --bg: #121212;
+            --card: #1e1e1e;
+            --border: #374151;
+            --text-main: #f3f4f6;
+            --text-muted: #9ca3af;
+            --input-bg: #2d3748;
+            --table-header: #2d3748;
+            --row-hover: #2d3748;
+            --me-yellow: #cca600;
+            --me-yellow-hover: #e5bc00;
         }
 
-        body { font-family: 'Segoe UI', Roboto, Arial, sans-serif; background: var(--bg); color: var(--text-main); margin: 0; padding: 15px; transition: 0.3s; }
-        .container { max-width: 1300px; margin: 0 auto; background: var(--card); padding: 25px; border-radius: 12px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); }
+        body { font-family: 'Segoe UI', Roboto, Arial, sans-serif; background: var(--bg); color: var(--text-main); margin: 0; padding: 20px; transition: 0.3s; }
+        .container { max-width: 1250px; margin: 0 auto; background: var(--card); padding: 30px; border-radius: 12px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); }
         
-        header { display: flex; justify-content: space-between; align-items: center; border-bottom: 4px solid var(--me-yellow); margin-bottom: 20px; padding-bottom: 10px; }
-        h1 { margin: 0; font-size: 1.5rem; text-transform: uppercase; }
-        
-        /* ZAKŁADKI (TABS) */
-        .tabs { display: flex; gap: 10px; margin-bottom: 20px; }
-        .tab-btn { padding: 12px 25px; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; background: var(--table-header); color: var(--text-muted); font-size: 1.1rem; border: 1px solid var(--border); transition: 0.2s; }
-        .tab-btn.active { background: var(--me-dark); color: #fff; border-color: var(--me-dark); }
-        .tab-content { display: none; }
-        .tab-content.active { display: block; animation: fadeIn 0.3s; }
+        header { display: flex; justify-content: space-between; align-items: center; border-bottom: 4px solid var(--me-yellow); margin-bottom: 20px; padding-bottom: 15px; }
+        h1 { margin: 0; font-size: 1.8rem; text-transform: uppercase; color: var(--text-main); }
+        .header-actions { display: flex; gap: 10px; }
 
-        .header-actions { display: flex; gap: 8px; }
-        button { padding: 10px 15px; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; transition: 0.2s; }
-        .btn-theme { background: var(--me-dark); color: #fff; }
-        .btn-clear { background: #fee2e2; color: var(--danger); }
-        .btn-add { background: var(--table-header); color: var(--text-main); border: 1px solid var(--border); width: 100%; margin-bottom: 20px; padding: 15px; font-size: 1.1rem; }
-        .btn-calc { background: var(--me-yellow); color: #000; font-size: 1.2rem; text-transform: uppercase; padding: 15px 30px; }
-
-        /* TABELA KALKULATORA */
         .product-table { width: 100%; border-collapse: collapse; margin-bottom: 20px; }
         .product-table th { text-align: left; background: var(--table-header); padding: 12px; font-size: 0.85rem; color: var(--text-muted); text-transform: uppercase; border-bottom: 2px solid var(--border); }
+        .product-row { transition: background-color 0.2s; }
+        .product-row.drag-over { border-top: 2px dashed var(--me-yellow); }
         .product-row td { padding: 10px; border-bottom: 1px solid var(--border); }
-        input[type="text"], input[type="number"], select { width: 100%; padding: 10px; border: 1px solid var(--border); border-radius: 6px; box-sizing: border-box; font-size: 0.95rem; background-color: var(--input-bg); color: var(--text-main); }
+        .product-row:hover { background-color: var(--row-hover); }
+
+        .drag-handle { cursor: grab; color: var(--text-muted); font-size: 1.2rem; text-align: center; width: 30px; }
+        .drag-handle:active { cursor: grabbing; }
+
+        input[type="text"], input[type="number"], select {
+            width: 100%; padding: 10px; border: 1px solid var(--border); border-radius: 6px; box-sizing: border-box; font-size: 0.95rem; background-color: var(--input-bg); color: var(--text-main);
+        }
         .checkbox-cell { text-align: center; }
-        .checkbox-cell input { width: 20px; height: 20px; }
+        .checkbox-cell input { width: 20px; height: 20px; cursor: pointer; }
 
-        /* WIZUALIZATOR KUCHNI */
-        .viz-layout { display: flex; gap: 20px; flex-wrap: wrap; }
-        .viz-inventory { flex: 1; min-width: 250px; border: 2px solid var(--border); border-radius: 8px; padding: 15px; background: var(--table-header); }
-        .viz-kitchen { flex: 3; min-width: 600px; display: flex; justify-content: center; align-items: flex-end; gap: 5px; padding: 40px 20px; background: linear-gradient(to bottom, var(--bg) 0%, #e2e8f0 100%); border-radius: 8px; border: 1px solid var(--border); min-height: 500px; position: relative; }
+        .actions { display: flex; gap: 10px; margin-bottom: 30px; flex-wrap: wrap; }
+        button { padding: 12px 20px; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; transition: 0.2s; font-size: 1rem; }
         
-        .inv-item { background: var(--card); border: 2px solid var(--border); padding: 10px; border-radius: 6px; margin-bottom: 10px; cursor: pointer; text-align: center; transition: 0.2s; display: flex; flex-direction: column; align-items: center; justify-content: center; font-size: 0.9rem; font-weight: bold; }
-        .inv-item:hover { border-color: var(--me-yellow); }
-        .inv-item.selected { border-color: var(--me-yellow); background: #fef9c3; transform: scale(1.02); box-shadow: 0 4px 6px rgba(0,0,0,0.1); color: #000; }
-        .inv-item img { max-width: 80px; max-height: 80px; object-fit: contain; margin-top: 5px; }
+        .btn-add { background: var(--table-header); color: var(--text-main); border: 1px solid var(--border); }
+        .btn-clear { background: #fee2e2; color: var(--danger); }
+        .btn-theme { background: var(--me-dark); color: #fff; }
+        .btn-share { background: #e0e7ff; color: #3730a3; border: 1px solid #c7d2fe; }
+        .btn-share:hover { background: #c7d2fe; }
+        
+        .btn-print-formal { background: #e0f2fe; color: #0284c7; }
+        .btn-print-simple { background: #f1f5f9; color: #475569; border: 1px solid #cbd5e1; }
+        .btn-calc { background: var(--me-yellow); color: #000; flex-grow: 1; font-size: 1.2rem; text-transform: uppercase; }
+        .btn-calc:hover { background: var(--me-yellow-hover); }
 
-        /* ELEMENTY KUCHNI */
-        .cabinet-tall { width: 140px; height: 400px; background: #e2e8f0; border: 2px solid #94a3b8; display: flex; flex-direction: column; justify-content: space-around; padding: 10px; border-radius: 4px; }
-        .cabinet-base { width: 200px; height: 180px; background: #e2e8f0; border: 2px solid #94a3b8; border-top: 10px solid #a16207; /* Blat */ display: flex; flex-direction: column; justify-content: flex-start; align-items: center; padding: 10px; border-radius: 4px; position: relative; }
-        
-        .viz-slot { width: 100%; min-height: 80px; border: 2px dashed #94a3b8; background: rgba(255,255,255,0.5); display: flex; align-items: center; justify-content: center; cursor: pointer; transition: 0.2s; font-size: 0.8rem; color: #64748b; text-align: center; overflow: hidden; position: relative; }
-        .viz-slot:hover { border-color: var(--me-yellow); background: rgba(255,230,0,0.1); }
-        .viz-slot.highlight { border-color: var(--success); border-style: solid; background: #d1fae5; }
-        .viz-slot.filled { border-style: solid; border-color: #475569; background: #1e293b; color: #fff; padding: 0; }
-        
-        .viz-slot img { width: 100%; height: 100%; object-fit: cover; }
-        .viz-slot .remove-btn { position: absolute; top: 2px; right: 2px; background: rgba(239, 68, 68, 0.9); color: white; border: none; border-radius: 50%; width: 20px; height: 20px; font-size: 10px; cursor: pointer; display: none; }
-        .viz-slot.filled:hover .remove-btn { display: block; }
+        .results { display: none; margin-top: 30px; animation: fadeIn 0.5s; }
+        .summary-box { background: var(--me-dark); color: #fff; padding: 25px; border-radius: 12px; text-align: center; margin-bottom: 30px; }
+        .summary-price { font-size: 3rem; color: var(--me-yellow); font-weight: 800; }
+        .grid-results { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; }
 
-        /* DEDYKOWANE WYMIARY SLOTÓW */
-        .slot-fridge { height: 350px; }
-        .slot-oven { height: 100px; margin-bottom: 5px; }
-        .slot-micro { height: 70px; }
-        .slot-hob { height: 20px; width: 120px; position: absolute; top: -15px; background: #1e293b; color: #fff; border-color: #000; border-radius: 4px; }
-        .slot-hood { position: absolute; top: -200px; width: 120px; height: 40px; border-radius: 4px 4px 0 0; }
-
-        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        .order-card { background: var(--card); border: 2px solid var(--border); border-radius: 10px; padding: 20px; position: relative; }
+        .order-card h3 { margin-top: 0; border-bottom: 2px solid var(--me-yellow); padding-bottom: 10px; display: flex; justify-content: space-between; color: var(--text-main); font-size: 1.2rem; }
+        .order-card.loose-card h3 { border-bottom-color: var(--text-muted); }
+        .order-card.special-card h3 { border-bottom-color: #3b82f6; }
         
-        /* UKRYWANIE ELEMENTÓW DO DRUKU */
+        .explain-text { font-size: 0.85rem; color: var(--text-muted); margin-top: -5px; margin-bottom: 15px; font-style: italic; }
+        
+        .item-list { list-style: none; padding: 0; margin: 0; }
+        .item-list li { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid var(--border); color: var(--text-main); align-items: center; }
+
+        .discount-badge { background: #dcfce7; color: #166534; padding: 4px 8px; border-radius: 4px; font-size: 0.8rem; font-weight: bold; }
+        .index-badge { font-size: 0.75rem; color: var(--text-muted); background: var(--bg); padding: 2px 6px; border-radius: 4px; border: 1px solid var(--border); margin-left: 8px; font-family: monospace; }
+        .loader { display: none; text-align: center; padding: 20px; font-weight: bold; color: var(--text-muted); }
+
+        /* --- STYLE DO WYDRUKU PDF --- */
+        .print-header, .print-footer { display: none; }
         @media print {
+            body { background: #fff !important; color: #000 !important; font-size: 12pt; padding: 0; }
+            .container { box-shadow: none; border: none; padding: 0; max-width: 100%; }
             .no-print { display: none !important; }
-            .container { box-shadow: none; padding: 0; }
+            
+            .order-card { break-inside: avoid; border: 1px solid #000; margin-bottom: 20px; padding: 15px; }
+            .summary-box { background: #f8f8f8 !important; color: #000 !important; border: 2px solid #000; padding: 15px; }
+            .summary-price { color: #000 !important; }
+            .discount-badge { border: 1px solid #000; background: transparent; color: #000; }
+            .explain-text { color: #444; }
+            .print-header { display: block; text-align: center; margin-bottom: 20px; padding-bottom: 10px; }
+            
+            body.print-formal .print-header { border-bottom: 2px solid #000; }
+            body.print-formal .print-footer { display: block; margin-top: 40px; font-size: 0.8rem; color: #555; text-align: justify; border-top: 1px solid #ccc; padding-top: 10px; }
+            
+            body.print-simple .print-footer { display: none !important; }
+            body.print-simple .explain-text { display: none !important; }
+            body.print-simple .order-card { border: none !important; border-bottom: 1px dashed #000 !important; padding: 10px 0 !important; }
+            body.print-simple .order-card h3 { border-bottom: none !important; font-size: 1.1rem !important; margin-bottom: 5px; }
+            body.print-simple .summary-box { border: none !important; border-top: 2px solid #000 !important; border-bottom: 2px solid #000 !important; }
         }
     </style>
 </head>
 <body>
 
 <div class="container">
+    <div class="print-header">
+        <h2 id="print-title">Wycena Zestawu - Media Expert</h2>
+        <p id="print-date"></p>
+    </div>
+
     <header class="no-print">
-        <h1>PRO Narzędzia</h1>
+        <h1>Optymalizator Zestawów</h1>
         <div class="header-actions">
             <button class="btn-theme" onclick="toggleTheme()">🌓 Motyw</button>
+            <button class="btn-share" onclick="shareBasket()">🔗 Udostępnij</button>
             <button class="btn-clear" onclick="clearData()">Wyczyść</button>
         </div>
     </header>
 
-    <div class="tabs no-print">
-        <button class="tab-btn active" onclick="switchTab('kalkulator', this)">🧮 Kalkulator Promocji</button>
-        <button class="tab-btn" onclick="switchTab('wizualizator', this)">🎨 Wizualizator Zabudowy</button>
-    </div>
-
-    <div id="tab-kalkulator" class="tab-content active">
+    <div class="no-print">
         <table class="product-table">
             <thead>
                 <tr>
-                    <th style="width: 20%;">Nazwa produktu</th>
-                    <th style="width: 15%;">Typ Promocji / AGD</th>
-                    <th style="width: 15%;">Nazwa pliku foto<br><small>(np. piekarnik1.png)</small></th>
-                    <th style="width: 15%;">Cena wyjściowa</th>
-                    <th style="width: 15%;">Po kodzie</th>
-                    <th class="checkbox-cell" style="width: 10%;">Brak Multi</th>
-                    <th style="width: 10%;"></th>
+                    <th style="width: 30px;"></th>
+                    <th>Nazwa produktu</th>
+                    <th style="width: 12%;">Indeks</th>
+                    <th style="width: 18%;">Typ Promocji Dedyk.</th>
+                    <th style="width: 12%;">Cena wyj. (zł)</th>
+                    <th style="width: 12%;">Po kodzie (zł)</th>
+                    <th class="checkbox-cell" style="width: 8%; font-size:0.75rem;">Wyklucz<br>z Multi</th>
+                    <th style="width: 40px;"></th>
                 </tr>
             </thead>
             <tbody id="product-body"></tbody>
         </table>
 
-        <button class="btn-add" onclick="addProduct()">+ Dodaj kolejny sprzęt do koszyka</button>
-        <div style="text-align: center;">
-            <button class="btn-calc" onclick="alert('Tu wywołujemy funkcję liczenia z poprzedniej wersji. Dla czytelności skupiamy się na Wizualizatorze.')">Przelicz Zestawy (Ukryte na próbę)</button>
+        <div class="actions">
+            <button class="btn-add" onclick="addProduct()">+ Dodaj produkt</button>
+            <button class="btn-calc" onclick="runCalculation()">1. Przelicz Zestawy</button>
+            <button class="btn-print-formal btn-print-group" onclick="generatePDF('formal')" style="display:none;">2. PDF: Oficjalna Wycena</button>
+            <button class="btn-print-simple btn-print-group" onclick="generatePDF('simple')" style="display:none;">3. PDF: Szybka Lista</button>
         </div>
     </div>
 
-    <div id="tab-wizualizator" class="tab-content">
-        <p style="color: var(--text-muted); margin-top:0;"><b>Instrukcja na iPada:</b> 1. Kliknij sprzęt po lewej (zaświeci się na żółto). 2. Kliknij puste miejsce w szafce po prawej, by go wstawić.</p>
-        
-        <div class="viz-layout">
-            <div class="viz-inventory">
-                <h3 style="margin-top:0; border-bottom: 2px solid var(--border); padding-bottom: 10px;">Twoje Sprzęty:</h3>
-                <div id="inventory-list">
-                    </div>
-            </div>
+    <div id="loader" class="loader no-print">Przeszukiwanie milionów kombinacji rabatowych...</div>
 
-            <div class="viz-kitchen">
-                <div class="cabinet-tall">
-                    <div class="viz-slot slot-fridge" onclick="assignToSlot(this, 'Lodówka')" title="Miejsce na lodówkę do zabudowy">Lodówka<br>(Słupek)</div>
-                </div>
-
-                <div class="cabinet-tall">
-                    <div class="viz-slot slot-micro" onclick="assignToSlot(this, 'Mikrofala')" title="Miejsce na mikrofalę/ekspres">Kompakt / Mikrofala</div>
-                    <div class="viz-slot slot-oven" onclick="assignToSlot(this, 'Piekarnik')" title="Miejsce na piekarnik">Piekarnik</div>
-                    <div style="height: 100px; background: #cbd5e1; border: 1px solid #94a3b8; border-radius:4px;"></div> </div>
-
-                <div class="cabinet-base">
-                    <div class="viz-slot slot-hood" onclick="assignToSlot(this, 'Okap')" title="Miejsce na okap">Okap</div>
-                    <div class="viz-slot slot-hob" onclick="assignToSlot(this, 'Płyta')" title="Miejsce na płytę grzewczą">Płyta</div>
-                    
-                    <div style="width:100%; height:100%; display:flex; gap:5px;">
-                        <div class="viz-slot" style="flex:1; height: 100%; border: 1px solid #94a3b8;" onclick="assignToSlot(this, 'Zmywarka')">Zmywarka<br>(Pod blat)</div>
-                        <div style="flex:1; height: 100%; background: #94a3b8; display:flex; align-items:center; justify-content:center; color:#fff; font-size:0.8rem;">Szafka</div>
-                    </div>
-                </div>
-            </div>
+    <div id="results" class="results">
+        <div class="summary-box">
+            <div style="font-size: 1.2rem;">Najlepsza cena łączna za wszystkie produkty:</div>
+            <div class="summary-price" id="total-price">0,00 zł</div>
+            <div style="color: var(--success); font-weight: bold; font-size: 1.1rem;" id="total-savings"></div>
         </div>
+        <div class="grid-results" id="order-grid"></div>
+    </div>
+
+    <div class="print-footer">
+        <strong>Informacja ważna:</strong> Wycena ma charakter wyłącznie poglądowy i informacyjny. Obliczenia zostały sporządzone w oparciu o bieżące promocje i ceny w systemie, które są ważne na dzień i godzinę sporządzenia wyceny. Dostępność towaru, rabaty wynikające z promocji typu "Multi-rabaty" oraz ostateczne ceny mogą ulec zmianie w momencie finalizacji transakcji. Dokument ten nie stanowi oferty handlowej w rozumieniu art. 66 § 1 Kodeksu Cywilnego.
     </div>
 </div>
 
 <script>
-    // --- REJESTRACJA SERVICE WORKERA (PWA) ---
-    if ('serviceWorker' in navigator) {
-        window.addEventListener('load', () => {
-            navigator.serviceWorker.register('sw.js').then(reg => {
-                console.log('ServiceWorker zarejestrowany!', reg);
-            }).catch(err => {
-                console.log('ServiceWorker błąd rejestracji:', err);
-            });
-        });
-    }
-
-    // --- MOTYW I TABS ---
+    // MOTYW
     if(localStorage.getItem('theme') === 'dark') document.body.classList.add('dark-mode');
     function toggleTheme() {
         document.body.classList.toggle('dark-mode');
         localStorage.setItem('theme', document.body.classList.contains('dark-mode') ? 'dark' : 'light');
     }
 
-    function switchTab(tabId, btn) {
-        document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
-        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-        document.getElementById('tab-' + tabId).classList.add('active');
-        btn.classList.add('active');
-        if(tabId === 'wizualizator') renderInventory(); // Odśwież widok magazynu po wejściu
+    // OBSŁUGA LINKÓW (IMPORT KOSZYKA)
+    const params = new URLSearchParams(window.location.search);
+    let initialProducts = null;
+    if (params.has('d')) {
+        try {
+            const decoded = JSON.parse(decodeURIComponent(atob(params.get('d'))));
+            initialProducts = decoded.map(p => ({
+                id: Date.now() + Math.random(),
+                name: p.n || '', index: p.i || '', type: p.t || 'other', 
+                basePrice: p.b || '', codePrice: p.c || '', excluded: p.e || false
+            }));
+            window.history.replaceState(null, '', window.location.pathname);
+        } catch(e) { console.error("Nieprawidłowy link udostępniania."); }
     }
 
-    // --- DANE KALKULATORA ---
-    let products = JSON.parse(localStorage.getItem('me_products_v6')) || [
-        { id: 1, name: 'Piekarnik DualCook', type: 'oven', image: 'piekarnik1.png', basePrice: '2500' },
-        { id: 2, name: 'Płyta Indukcja', type: 'hob', image: '', basePrice: '1500' }
+    // DANE
+    let products = initialProducts || JSON.parse(localStorage.getItem('me_products_v5')) || [
+        { id: Date.now(), name: '', index: '', type: 'other', basePrice: '', codePrice: '', excluded: false }
     ];
 
-    function save() { localStorage.setItem('me_products_v6', JSON.stringify(products)); }
+    function save() { localStorage.setItem('me_products_v5', JSON.stringify(products)); }
 
-    function renderTable() {
+    // UDOSTĘPNIANIE
+    function shareBasket() {
+        const minimalData = products.map(p => ({
+            n: p.name, i: p.index, t: p.type, b: p.basePrice, c: p.codePrice, e: p.excluded
+        }));
+        const encoded = btoa(encodeURIComponent(JSON.stringify(minimalData)));
+        const url = window.location.origin + window.location.pathname + '?d=' + encoded;
+        
+        navigator.clipboard.writeText(url).then(() => {
+            alert("✅ Link skopiowany do schowka! Wyślij go innemu doradcy na WhatsAppie/komunikatorze.");
+        }).catch(() => {
+            prompt("Skopiuj ten link ręcznie:", url);
+        });
+    }
+
+    // DRAG & DROP
+    let draggedIndex = null;
+    function handleDragStart(e, i) { draggedIndex = i; e.target.style.opacity = '0.5'; }
+    function handleDragEnd(e) { e.target.style.opacity = '1'; document.querySelectorAll('.product-row').forEach(r => r.classList.remove('drag-over')); }
+    function handleDragOver(e) { e.preventDefault(); e.currentTarget.classList.add('drag-over'); }
+    function handleDragLeave(e) { e.currentTarget.classList.remove('drag-over'); }
+    function handleDrop(e, targetIndex) {
+        e.preventDefault(); e.currentTarget.classList.remove('drag-over');
+        if(draggedIndex === null || draggedIndex === targetIndex) return;
+        const item = products.splice(draggedIndex, 1)[0];
+        products.splice(targetIndex, 0, item);
+        save(); render();
+    }
+
+    function render() {
         const body = document.getElementById('product-body');
         body.innerHTML = '';
-        products.forEach(p => {
+        products.forEach((p, idx) => {
             const tr = document.createElement('tr');
             tr.className = 'product-row';
+            tr.draggable = true;
+            tr.addEventListener('dragstart', (e) => handleDragStart(e, idx));
+            tr.addEventListener('dragend', handleDragEnd);
+            tr.addEventListener('dragover', handleDragOver);
+            tr.addEventListener('dragleave', handleDragLeave);
+            tr.addEventListener('drop', (e) => handleDrop(e, idx));
+
             tr.innerHTML = `
-                <td><input type="text" placeholder="Nazwa" value="${p.name}" oninput="update(${p.id}, 'name', this.value)"></td>
+                <td class="drag-handle" title="Przeciągnij">☰</td>
+                <td><input type="text" placeholder="np. Piekarnik Electrolux" value="${p.name}" oninput="update(${p.id}, 'name', this.value)"></td>
+                <td><input type="text" placeholder="123456" value="${p.index || ''}" oninput="update(${p.id}, 'index', this.value)"></td>
                 <td>
                     <select onchange="update(${p.id}, 'type', this.value)">
-                        <option value="other" ${p.type==='other'?'selected':''}>Standard / Inne</option>
-                        <option value="oven" ${p.type==='oven'?'selected':''}>Piekarnik</option>
-                        <option value="hob" ${p.type==='hob'?'selected':''}>Płyta</option>
-                        <option value="micro" ${p.type==='micro'?'selected':''}>Mikrofala</option>
-                        <option value="fridge" ${p.type==='fridge'?'selected':''}>Lodówka</option>
+                        <option value="other" ${p.type === 'other' || !p.type ? 'selected' : ''}>Brak / Standard</option>
+                        <option value="washer" ${p.type === 'washer' ? 'selected' : ''}>Pralka (-50% z susz.)</option>
+                        <option value="dryer" ${p.type === 'dryer' ? 'selected' : ''}>Suszarka (do pralki)</option>
+                        <option value="oven" ${p.type === 'oven' ? 'selected' : ''}>Piekarnik (do płyty)</option>
+                        <option value="hob" ${p.type === 'hob' ? 'selected' : ''}>Płyta (-50% z piek.)</option>
+                        <option value="promo40" ${p.type === 'promo40' ? 'selected' : ''}>Drugi produkt -40%</option>
                     </select>
                 </td>
-                <td><input type="text" placeholder="np. piec.png" value="${p.image || ''}" oninput="update(${p.id}, 'image', this.value)"></td>
-                <td><input type="number" step="0.01" value="${p.basePrice || ''}" oninput="update(${p.id}, 'basePrice', this.value)"></td>
-                <td><input type="number" step="0.01" value="${p.codePrice || ''}"></td>
-                <td class="checkbox-cell"><input type="checkbox"></td>
-                <td><button style="color:var(--danger); background:none; padding:5px;" onclick="remove(${p.id})">✖</button></td>
+                <td><input type="number" step="0.01" placeholder="0.00" value="${p.basePrice}" oninput="update(${p.id}, 'basePrice', this.value)"></td>
+                <td><input type="number" step="0.01" placeholder="brak" value="${p.codePrice}" oninput="update(${p.id}, 'codePrice', this.value)"></td>
+                <td class="checkbox-cell"><input type="checkbox" ${p.excluded ? 'checked' : ''} onchange="update(${p.id}, 'excluded', this.checked)"></td>
+                <td><button style="color:var(--danger); background:none; font-size:1.2rem; padding:5px;" onclick="remove(${p.id})">✖</button></td>
             `;
             body.appendChild(tr);
         });
     }
 
-    function addProduct() { products.push({ id: Date.now(), name: '', type: 'other', image: '', basePrice: '' }); renderTable(); save(); }
-    function remove(id) { products = products.filter(p => p.id !== id); renderTable(); save(); }
-    function update(id, field, value) { const p = products.find(p => p.id === id); if(p) p[field] = value; save(); }
+    function addProduct() { products.push({ id: Date.now(), name: '', index: '', type: 'other', basePrice: '', codePrice: '', excluded: false }); render(); save(); }
+    function remove(id) { products = products.filter(p => p.id !== id); render(); save(); }
+    function update(id, field, value) { 
+        const p = products.find(p => p.id === id); 
+        if (p) p[field] = value; 
+        save(); hidePrintButtons();
+    }
+    function clearData() {
+        if(confirm("Wyczyścić dane i usunąć wyliczenia?")) {
+            products = [{ id: Date.now(), name: '', index: '', type: 'other', basePrice: '', codePrice: '', excluded: false }];
+            render(); save(); document.getElementById('results').style.display = 'none'; hidePrintButtons();
+        }
+    }
+    function hidePrintButtons() { document.querySelectorAll('.btn-print-group').forEach(b => b.style.display = 'none'); }
 
-    // --- LOGIKA WIZUALIZATORA (TAP & PLACE) ---
-    let selectedForViz = null;
+    // --- SZYBKI ALGORYTM ---
+    function format(val) { return (val / 100).toFixed(2).replace('.', ',') + ' zł'; }
 
-    function renderInventory() {
-        const list = document.getElementById('inventory-list');
-        list.innerHTML = '';
-        products.forEach(p => {
-            if(!p.name) return; // Pomiń puste wiersze
-            const div = document.createElement('div');
-            div.className = 'inv-item' + (selectedForViz && selectedForViz.id === p.id ? ' selected' : '');
+    function runCalculation() {
+        const validProducts = products.filter(p => p.basePrice > 0).map(p => ({
+            id: p.id, name: p.name || "Produkt", index: p.index || "", type: p.type || "other",
+            baseGrosze: Math.round(parseFloat(p.basePrice) * 100),
+            codeGrosze: p.codePrice ? Math.round(parseFloat(p.codePrice) * 100) : null,
+            excluded: p.excluded
+        }));
+        if (validProducts.length === 0) return alert("Wpisz ceny wyjściowe produktów!");
+        if (validProducts.length > 12) return alert("Zoptymalizowano dla max 12 produktów jednocześnie ze względu na limit kombinacji.");
+
+        document.getElementById('loader').style.display = 'block';
+        document.getElementById('results').style.display = 'none';
+        hidePrintButtons();
+
+        setTimeout(() => {
+            const best = solveOptimized(validProducts);
+            display(best, validProducts);
+            document.getElementById('loader').style.display = 'none';
+            document.getElementById('results').style.display = 'block';
+            document.querySelectorAll('.btn-print-group').forEach(b => b.style.display = 'inline-block');
+        }, 50);
+    }
+
+    function solveOptimized(items) {
+        const n = items.length;
+        let bestTotal = Infinity;
+        let bestAssignment = null;
+        const states = 6; // 0:Luzem/Kod, 1-4:Multi, 5:Pary Specjalne (Pralki, Piekarniki, 40%)
+        const totalCombos = Math.pow(states, n);
+        let assignment = new Array(n);
+
+        for (let i = 0; i < totalCombos; i++) {
+            let current = i;
+            let possible = true;
             
-            // Jesli użytkownik podał nazwę pliku, ładujemy z folderu 'img/'
-            // W przeciwnym razie pokazujemy ładny tekstualny klocek
-            let imgHtml = '';
-            if(p.image) {
-                imgHtml = `<img src="img/${p.image}" alt="Brak foto" onerror="this.style.display='none'">`;
-            } else {
-                imgHtml = `<div style="width:60px; height:60px; background:#333; margin-top:5px; border-radius:4px; border:2px solid #555;"></div>`;
+            for (let j = 0; j < n; j++) {
+                let s = current % states;
+                current = Math.floor(current / states);
+                
+                if (items[j].excluded && s >= 1 && s <= 4) { possible = false; break; }
+                if (s === 5 && items[j].type === 'other') { possible = false; break; }
+                assignment[j] = s;
+            }
+            if (!possible) continue;
+
+            let total = 0;
+            let multiCosts = [0,0,0,0], multiMins = [Infinity,Infinity,Infinity,Infinity], multiCounts = [0,0,0,0];
+            let group5 = { washer: [], dryer: [], oven: [], hob: [], promo40: [] };
+
+            for (let j = 0; j < n; j++) {
+                let s = assignment[j];
+                let it = items[j];
+                if (s === 0) {
+                    total += (it.codeGrosze !== null && it.codeGrosze < it.baseGrosze) ? it.codeGrosze : it.baseGrosze;
+                } else if (s >= 1 && s <= 4) {
+                    let k = s - 1;
+                    multiCosts[k] += it.baseGrosze;
+                    if (it.baseGrosze < multiMins[k]) multiMins[k] = it.baseGrosze;
+                    multiCounts[k]++;
+                } else if (s === 5) {
+                    group5[it.type].push(it.baseGrosze);
+                }
             }
 
-            div.innerHTML = `<span>${p.name}</span>${imgHtml}`;
-            div.onclick = () => selectItemForViz(p, div);
-            list.appendChild(div);
-        });
-    }
+            // Weryfikacja State 5 - Muszą tworzyć idealne pary
+            if (group5.washer.length !== group5.dryer.length) continue;
+            if (group5.oven.length !== group5.hob.length) continue;
+            if (group5.promo40.length % 2 !== 0) continue;
 
-    function selectItemForViz(product, element) {
-        selectedForViz = product;
-        document.querySelectorAll('.inv-item').forEach(el => el.classList.remove('selected'));
-        element.classList.add('selected');
-        
-        // Podświetl wszystkie sloty, żeby użytkownik wiedział, gdzie może kliknąć
-        document.querySelectorAll('.viz-slot').forEach(s => s.classList.add('highlight'));
-        setTimeout(() => document.querySelectorAll('.viz-slot').forEach(s => s.classList.remove('highlight')), 1000);
-    }
+            // Obliczenia dla State 5 (Pary Dedykowane)
+            let cost5 = 0;
+            cost5 += group5.washer.reduce((acc, val) => acc + Math.round(val * 0.5), 0);
+            cost5 += group5.dryer.reduce((acc, val) => acc + val, 0);
+            cost5 += group5.oven.reduce((acc, val) => acc + val, 0);
+            cost5 += group5.hob.reduce((acc, val) => acc + Math.round(val * 0.5), 0);
+            
+            if (group5.promo40.length > 0) {
+                group5.promo40.sort((a, b) => b - a); // Sortuj malejąco, by -40% weszło na tańszy z pary
+                for (let p = 0; p < group5.promo40.length; p += 2) {
+                    cost5 += group5.promo40[p] + Math.round(group5.promo40[p+1] * 0.6);
+                }
+            }
+            total += cost5;
 
-    function assignToSlot(slotElement, slotName) {
-        if (!selectedForViz) {
-            // Jeśli kliknął w slot i jest on pełny (chce go wyczyścić)
-            return; 
+            // Multi-rabaty
+            for (let k = 0; k < 4; k++) {
+                if (multiCounts[k] === 0) continue;
+                if (multiCounts[k] === 1) { total += multiCosts[k]; } 
+                else {
+                    let c = multiCounts[k], min = multiMins[k], d = 0;
+                    if (c === 2) d = Math.round(min * 0.30);
+                    else if (c === 3) d = Math.round(min * 0.55);
+                    else if (c === 4) d = Math.round(min * 0.80);
+                    else if (c >= 5) d = min - 100;
+                    total += (multiCosts[k] - d);
+                }
+            }
+
+            if (total < bestTotal) {
+                bestTotal = total;
+                bestAssignment = [...assignment];
+            }
         }
 
-        slotElement.classList.add('filled');
-        
-        if (selectedForViz.image) {
-            slotElement.innerHTML = `<img src="img/${selectedForViz.image}" alt="${selectedForViz.name}">
-                                     <button class="remove-btn" onclick="clearSlot(event, this.parentElement, '${slotName}')">✖</button>`;
-        } else {
-            slotElement.innerHTML = `<div style="text-align:center; padding:5px; font-weight:bold;">${selectedForViz.name}</div>
-                                     <button class="remove-btn" onclick="clearSlot(event, this.parentElement, '${slotName}')">✖</button>`;
+        let groups = [[], [], [], [], [], []];
+        if (bestAssignment) { for(let j=0; j<n; j++) groups[bestAssignment[j]].push(items[j]); }
+        return { groups, bestTotal };
+    }
+
+    function getBundleCost(items) {
+        if (items.length === 0) return { total: 0, discount: 0 };
+        if (items.length === 1) return { total: items[0].baseGrosze, discount: 0 };
+        let sum = items.reduce((a, b) => a + b.baseGrosze, 0);
+        let min = Math.min(...items.map(i => i.baseGrosze));
+        let discount = 0;
+        if (items.length === 2) discount = Math.round(min * 0.30);
+        else if (items.length === 3) discount = Math.round(min * 0.55);
+        else if (items.length === 4) discount = Math.round(min * 0.80);
+        else if (items.length >= 5) discount = min - 100;
+        return { total: sum - discount, discount: discount };
+    }
+
+    function display(best, allItems) {
+        document.getElementById('total-price').innerText = format(best.bestTotal);
+        let baseSum = allItems.reduce((a, b) => a + b.baseGrosze, 0);
+        document.getElementById('total-savings').innerText = "Klient zyskuje łącznie rabat: " + format(baseSum - best.bestTotal);
+
+        const grid = document.getElementById('order-grid');
+        grid.innerHTML = '';
+
+        // MULTI-RABATY
+        for (let i = 1; i <= 4; i++) {
+            if (best.groups[i].length > 0) {
+                let res = getBundleCost(best.groups[i]);
+                const card = document.createElement('div');
+                card.className = 'order-card';
+                let itemsHtml = best.groups[i].map(item => `
+                    <li><div>${item.name} ${item.index ? `<span class="index-badge">SKU: ${item.index}</span>` : ''}</div> <span>${format(item.baseGrosze)}</span></li>
+                `).join('');
+                
+                card.innerHTML = `
+                    <h3>🛒 Zestaw Multi-Rabat #${i} <span style="color:var(--success)">${format(res.total)}</span></h3>
+                    <p class="explain-text">Te produkty nabij wspólnie na jeden paragon (Rabat z najtańszego).</p>
+                    <ul class="item-list">${itemsHtml}</ul>
+                    <div style="text-align:right; margin-top:10px;">
+                        <span class="discount-badge" style="background:#fef3c7; color:#b45309">Zniżka Multi: -${format(res.discount)}</span>
+                    </div>
+                `;
+                grid.appendChild(card);
+            }
         }
+
+        // PARY PROMOCYJNE
+        if (best.groups[5].length > 0) {
+            let totalCost5 = 0, totalDiscount5 = 0;
+            let promo40Items = best.groups[5].filter(it => it.type === 'promo40').sort((a, b) => b.baseGrosze - a.baseGrosze);
+
+            let itemsHtml = best.groups[5].map(it => {
+                let p = it.baseGrosze;
+                let text = '';
+                if(it.type === 'washer') { p = Math.round(it.baseGrosze * 0.5); text = '-50% (Pralnictwo)'; } 
+                else if(it.type === 'hob') { p = Math.round(it.baseGrosze * 0.5); text = '-50% (Zabudowa)'; }
+                else if(it.type === 'promo40') {
+                    let idx = promo40Items.findIndex(x => x.id === it.id);
+                    if (idx % 2 !== 0) { p = Math.round(it.baseGrosze * 0.6); text = '-40% (Drugi prod.)'; }
+                }
+                
+                let discountVal = it.baseGrosze - p;
+                totalCost5 += p;
+                totalDiscount5 += discountVal;
+
+                return `<li><div>${it.name} ${it.index ? `<span class="index-badge">SKU: ${it.index}</span>` : ''} ${text ? `<span class="discount-badge" style="background:#dbeafe; color:#1e40af; border:none; padding: 2px 5px;">${text}</span>` : ''}</div> <span>${format(p)}</span></li>`;
+            }).join('');
+
+            const card = document.createElement('div');
+            card.className = 'order-card special-card';
+            card.innerHTML = `
+                <h3>✨ Pakiety Zestawowe (Pary) <span style="color:var(--success)">${format(totalCost5)}</span></h3>
+                <p class="explain-text">Produkty połączone w dwupaki (Piekarnik+Płyta, Pralka+Suszarka, Drugi -40%).</p>
+                <ul class="item-list">${itemsHtml}</ul>
+                <div style="text-align:right; margin-top:10px;"><span class="discount-badge" style="background:#dbeafe; color:#1e40af">Oszczędność w pakietach: -${format(totalDiscount5)}</span></div>
+            `;
+            grid.appendChild(card);
+        }
+
+        // KODY LUB OSOBNO
+        if (best.groups[0].length > 0) {
+            let groupSum = 0;
+            let itemsHtml = best.groups[0].map(item => {
+                let price = (item.codeGrosze !== null && item.codeGrosze < item.baseGrosze) ? item.codeGrosze : item.baseGrosze;
+                let usedCode = item.codeGrosze !== null && item.codeGrosze < item.baseGrosze;
+                groupSum += price;
+                return `<li><div>${item.name} ${item.index ? `<span class="index-badge">SKU: ${item.index}</span>` : ''} ${usedCode ? '<span class="discount-badge" style="background:#e0f2fe; color:#0369a1; border:none; padding: 2px 5px;">KOD - UŻYTO ZNIŻKI</span>' : ''}</div> <span>${format(price)}</span></li>`;
+            }).join('');
+
+            const card = document.createElement('div');
+            card.className = 'order-card loose-card';
+            card.innerHTML = `
+                <h3>🎟️ Produkty Osobne / Kody <span>${format(groupSum)}</span></h3>
+                <p class="explain-text">Nabij na kody zniżkowe lub pojedynczo (brak opłacalności wciskania ich do Multi).</p>
+                <ul class="item-list">${itemsHtml}</ul>
+            `;
+            grid.appendChild(card);
+        }
+    }
+
+    function generatePDF(mode) {
+        document.body.classList.remove('print-formal', 'print-simple');
+        document.body.classList.add('print-' + mode);
+        document.getElementById('print-title').innerText = mode === 'formal' ? 'Wycena Zestawu - Media Expert' : 'Zestawienie Robocze';
         
-        // Odznacz przedmiot w magazynie
-        selectedForViz = null;
-        renderInventory();
+        const now = new Date();
+        document.getElementById('print-date').innerHTML = `Data: <strong>${now.toLocaleDateString('pl-PL')}</strong>, godz. <strong>${now.toLocaleTimeString('pl-PL', {hour: '2-digit', minute:'2-digit'})}</strong>`;
+        
+        window.print();
     }
 
-    function clearSlot(event, slotElement, originalText) {
-        event.stopPropagation(); // Zapobiega odpaleniu assignToSlot przy kliknięciu 'X'
-        slotElement.classList.remove('filled');
-        slotElement.innerHTML = originalText;
-    }
-
-    // Start
-    renderTable();
+    render();
 </script>
 
 </body>
