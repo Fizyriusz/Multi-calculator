@@ -35,7 +35,7 @@
         }
 
         body { font-family: 'Segoe UI', Roboto, Arial, sans-serif; background: var(--bg); color: var(--text-main); margin: 0; padding: 20px; transition: 0.3s; }
-        .container { max-width: 1200px; margin: 0 auto; background: var(--card); padding: 30px; border-radius: 12px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); }
+        .container { max-width: 1250px; margin: 0 auto; background: var(--card); padding: 30px; border-radius: 12px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); }
         
         header { display: flex; justify-content: space-between; align-items: center; border-bottom: 4px solid var(--me-yellow); margin-bottom: 20px; padding-bottom: 15px; }
         h1 { margin: 0; font-size: 1.8rem; text-transform: uppercase; color: var(--text-main); }
@@ -63,6 +63,9 @@
         .btn-add { background: var(--table-header); color: var(--text-main); border: 1px solid var(--border); }
         .btn-clear { background: #fee2e2; color: var(--danger); }
         .btn-theme { background: var(--me-dark); color: #fff; }
+        .btn-share { background: #e0e7ff; color: #3730a3; border: 1px solid #c7d2fe; }
+        .btn-share:hover { background: #c7d2fe; }
+        
         .btn-print-formal { background: #e0f2fe; color: #0284c7; }
         .btn-print-simple { background: #f1f5f9; color: #475569; border: 1px solid #cbd5e1; }
         .btn-calc { background: var(--me-yellow); color: #000; flex-grow: 1; font-size: 1.2rem; text-transform: uppercase; }
@@ -94,7 +97,6 @@
             .container { box-shadow: none; border: none; padding: 0; max-width: 100%; }
             .no-print { display: none !important; }
             
-            /* Domyślne ustawienia dla wydruku */
             .order-card { break-inside: avoid; border: 1px solid #000; margin-bottom: 20px; padding: 15px; }
             .summary-box { background: #f8f8f8 !important; color: #000 !important; border: 2px solid #000; padding: 15px; }
             .summary-price { color: #000 !important; }
@@ -102,7 +104,6 @@
             .explain-text { color: #444; }
             .print-header { display: block; text-align: center; margin-bottom: 20px; padding-bottom: 10px; }
             
-            /* Zależne od trybu druku (Oficjalny vs Prosty) */
             body.print-formal .print-header { border-bottom: 2px solid #000; }
             body.print-formal .print-footer { display: block; margin-top: 40px; font-size: 0.8rem; color: #555; text-align: justify; border-top: 1px solid #ccc; padding-top: 10px; }
             
@@ -126,6 +127,7 @@
         <h1>Optymalizator Zestawów</h1>
         <div class="header-actions">
             <button class="btn-theme" onclick="toggleTheme()">🌓 Motyw</button>
+            <button class="btn-share" onclick="shareBasket()">🔗 Udostępnij</button>
             <button class="btn-clear" onclick="clearData()">Wyczyść</button>
         </div>
     </header>
@@ -137,10 +139,10 @@
                     <th style="width: 30px;"></th>
                     <th>Nazwa produktu</th>
                     <th style="width: 12%;">Indeks</th>
-                    <th style="width: 14%;">Typ (Promocje)</th>
+                    <th style="width: 18%;">Typ Promocji Dedyk.</th>
                     <th style="width: 12%;">Cena wyj. (zł)</th>
                     <th style="width: 12%;">Po kodzie (zł)</th>
-                    <th class="checkbox-cell" style="width: 10%;">Brak Multi</th>
+                    <th class="checkbox-cell" style="width: 8%; font-size:0.75rem;">Wyklucz<br>z Multi</th>
                     <th style="width: 40px;"></th>
                 </tr>
             </thead>
@@ -150,8 +152,8 @@
         <div class="actions">
             <button class="btn-add" onclick="addProduct()">+ Dodaj produkt</button>
             <button class="btn-calc" onclick="runCalculation()">1. Przelicz Zestawy</button>
-            <button class="btn-print-formal btn-print-group" onclick="generatePDF('formal')" style="display:none;">2. Drukuj: Oficjalna Wycena</button>
-            <button class="btn-print-simple btn-print-group" onclick="generatePDF('simple')" style="display:none;">3. Drukuj: Szybka Lista</button>
+            <button class="btn-print-formal btn-print-group" onclick="generatePDF('formal')" style="display:none;">2. PDF: Oficjalna Wycena</button>
+            <button class="btn-print-simple btn-print-group" onclick="generatePDF('simple')" style="display:none;">3. PDF: Szybka Lista</button>
         </div>
     </div>
 
@@ -172,19 +174,52 @@
 </div>
 
 <script>
+    // MOTYW
     if(localStorage.getItem('theme') === 'dark') document.body.classList.add('dark-mode');
     function toggleTheme() {
         document.body.classList.toggle('dark-mode');
         localStorage.setItem('theme', document.body.classList.contains('dark-mode') ? 'dark' : 'light');
     }
 
-    let products = JSON.parse(localStorage.getItem('me_products_v3')) || [
+    // OBSŁUGA LINKÓW (IMPORT KOSZYKA)
+    const params = new URLSearchParams(window.location.search);
+    let initialProducts = null;
+    if (params.has('d')) {
+        try {
+            const decoded = JSON.parse(decodeURIComponent(atob(params.get('d'))));
+            initialProducts = decoded.map(p => ({
+                id: Date.now() + Math.random(),
+                name: p.n || '', index: p.i || '', type: p.t || 'other', 
+                basePrice: p.b || '', codePrice: p.c || '', excluded: p.e || false
+            }));
+            // Czyszczenie paska adresu po imporcie
+            window.history.replaceState(null, '', window.location.pathname);
+        } catch(e) { console.error("Nieprawidłowy link udostępniania."); }
+    }
+
+    // DANE
+    let products = initialProducts || JSON.parse(localStorage.getItem('me_products_v5')) || [
         { id: Date.now(), name: '', index: '', type: 'other', basePrice: '', codePrice: '', excluded: false }
     ];
 
-    function save() { localStorage.setItem('me_products_v3', JSON.stringify(products)); }
+    function save() { localStorage.setItem('me_products_v5', JSON.stringify(products)); }
 
-    // Drag & Drop
+    // UDOSTĘPNIANIE
+    function shareBasket() {
+        const minimalData = products.map(p => ({
+            n: p.name, i: p.index, t: p.type, b: p.basePrice, c: p.codePrice, e: p.excluded
+        }));
+        const encoded = btoa(encodeURIComponent(JSON.stringify(minimalData)));
+        const url = window.location.origin + window.location.pathname + '?d=' + encoded;
+        
+        navigator.clipboard.writeText(url).then(() => {
+            alert("✅ Link skopiowany do schowka! Wyślij go innemu doradcy na WhatsAppie/komunikatorze.");
+        }).catch(() => {
+            prompt("Skopiuj ten link ręcznie:", url);
+        });
+    }
+
+    // DRAG & DROP
     let draggedIndex = null;
     function handleDragStart(e, i) { draggedIndex = i; e.target.style.opacity = '0.5'; }
     function handleDragEnd(e) { e.target.style.opacity = '1'; document.querySelectorAll('.product-row').forEach(r => r.classList.remove('drag-over')); }
@@ -213,18 +248,21 @@
 
             tr.innerHTML = `
                 <td class="drag-handle" title="Przeciągnij">☰</td>
-                <td><input type="text" placeholder="np. Lodówka" value="${p.name}" oninput="update(${p.id}, 'name', this.value)"></td>
+                <td><input type="text" placeholder="np. Piekarnik Electrolux" value="${p.name}" oninput="update(${p.id}, 'name', this.value)"></td>
                 <td><input type="text" placeholder="123456" value="${p.index || ''}" oninput="update(${p.id}, 'index', this.value)"></td>
                 <td>
                     <select onchange="update(${p.id}, 'type', this.value)">
-                        <option value="other" ${p.type === 'other' || !p.type ? 'selected' : ''}>Standard</option>
-                        <option value="washer" ${p.type === 'washer' ? 'selected' : ''}>Pralka</option>
-                        <option value="dryer" ${p.type === 'dryer' ? 'selected' : ''}>Suszarka</option>
+                        <option value="other" ${p.type === 'other' || !p.type ? 'selected' : ''}>Brak / Standard</option>
+                        <option value="washer" ${p.type === 'washer' ? 'selected' : ''}>Pralka (-50% z susz.)</option>
+                        <option value="dryer" ${p.type === 'dryer' ? 'selected' : ''}>Suszarka (do pralki)</option>
+                        <option value="oven" ${p.type === 'oven' ? 'selected' : ''}>Piekarnik (do płyty)</option>
+                        <option value="hob" ${p.type === 'hob' ? 'selected' : ''}>Płyta (-50% z piek.)</option>
+                        <option value="promo40" ${p.type === 'promo40' ? 'selected' : ''}>Drugi produkt -40%</option>
                     </select>
                 </td>
                 <td><input type="number" step="0.01" placeholder="0.00" value="${p.basePrice}" oninput="update(${p.id}, 'basePrice', this.value)"></td>
                 <td><input type="number" step="0.01" placeholder="brak" value="${p.codePrice}" oninput="update(${p.id}, 'codePrice', this.value)"></td>
-                <td class="checkbox-cell" title="Zaznacz, jeśli produkt nie łączy się w Multi-rabaty"><input type="checkbox" ${p.excluded ? 'checked' : ''} onchange="update(${p.id}, 'excluded', this.checked)"></td>
+                <td class="checkbox-cell"><input type="checkbox" ${p.excluded ? 'checked' : ''} onchange="update(${p.id}, 'excluded', this.checked)"></td>
                 <td><button style="color:var(--danger); background:none; font-size:1.2rem; padding:5px;" onclick="remove(${p.id})">✖</button></td>
             `;
             body.appendChild(tr);
@@ -239,7 +277,7 @@
         save(); hidePrintButtons();
     }
     function clearData() {
-        if(confirm("Wyczyścić dane?")) {
+        if(confirm("Wyczyścić dane i usunąć wyliczenia?")) {
             products = [{ id: Date.now(), name: '', index: '', type: 'other', basePrice: '', codePrice: '', excluded: false }];
             render(); save(); document.getElementById('results').style.display = 'none'; hidePrintButtons();
         }
@@ -251,12 +289,12 @@
 
     function runCalculation() {
         const validProducts = products.filter(p => p.basePrice > 0).map(p => ({
-            name: p.name || "Produkt", index: p.index || "", type: p.type || "other",
+            id: p.id, name: p.name || "Produkt", index: p.index || "", type: p.type || "other",
             baseGrosze: Math.round(parseFloat(p.basePrice) * 100),
             codeGrosze: p.codePrice ? Math.round(parseFloat(p.codePrice) * 100) : null,
             excluded: p.excluded
         }));
-        if (validProducts.length === 0) return alert("Wpisz ceny produktów!");
+        if (validProducts.length === 0) return alert("Wpisz ceny wyjściowe produktów!");
         if (validProducts.length > 12) return alert("Zoptymalizowano dla max 12 produktów jednocześnie ze względu na limit kombinacji.");
 
         document.getElementById('loader').style.display = 'block';
@@ -276,7 +314,7 @@
         const n = items.length;
         let bestTotal = Infinity;
         let bestAssignment = null;
-        const states = 6; // 0:Luzem, 1-4:Multi, 5:Pralka+Suszarka
+        const states = 6; // 0:Luzem/Kod, 1-4:Multi, 5:Pary Specjalne (Pralki, Piekarniki, 40%)
         const totalCombos = Math.pow(states, n);
         let assignment = new Array(n);
 
@@ -284,7 +322,6 @@
             let current = i;
             let possible = true;
             
-            // Przetwarzanie stanów i szybkie odrzucanie błędnych kombinacji (Pruning)
             for (let j = 0; j < n; j++) {
                 let s = current % states;
                 current = Math.floor(current / states);
@@ -295,9 +332,9 @@
             }
             if (!possible) continue;
 
-            // Obliczanie kosztu dla wariantu
-            let total = 0, cost5 = 0, washers = 0, dryers = 0;
+            let total = 0;
             let multiCosts = [0,0,0,0], multiMins = [Infinity,Infinity,Infinity,Infinity], multiCounts = [0,0,0,0];
+            let group5 = { washer: [], dryer: [], oven: [], hob: [], promo40: [] };
 
             for (let j = 0; j < n; j++) {
                 let s = assignment[j];
@@ -310,16 +347,31 @@
                     if (it.baseGrosze < multiMins[k]) multiMins[k] = it.baseGrosze;
                     multiCounts[k]++;
                 } else if (s === 5) {
-                    if (it.type === 'washer') { washers++; cost5 += Math.round(it.baseGrosze * 0.5); }
-                    else if (it.type === 'dryer') { dryers++; cost5 += it.baseGrosze; }
+                    group5[it.type].push(it.baseGrosze);
                 }
             }
 
-            // Walidacja Promocji 50%
-            if (washers !== dryers) continue; 
+            // Weryfikacja State 5 - Muszą tworzyć idealne pary
+            if (group5.washer.length !== group5.dryer.length) continue;
+            if (group5.oven.length !== group5.hob.length) continue;
+            if (group5.promo40.length % 2 !== 0) continue;
+
+            // Obliczenia dla State 5 (Pary Dedykowane)
+            let cost5 = 0;
+            cost5 += group5.washer.reduce((acc, val) => acc + Math.round(val * 0.5), 0);
+            cost5 += group5.dryer.reduce((acc, val) => acc + val, 0);
+            cost5 += group5.oven.reduce((acc, val) => acc + val, 0);
+            cost5 += group5.hob.reduce((acc, val) => acc + Math.round(val * 0.5), 0);
+            
+            if (group5.promo40.length > 0) {
+                group5.promo40.sort((a, b) => b - a); // Sortuj malejąco, by -40% weszło na tańszy z pary
+                for (let p = 0; p < group5.promo40.length; p += 2) {
+                    cost5 += group5.promo40[p] + Math.round(group5.promo40[p+1] * 0.6);
+                }
+            }
             total += cost5;
 
-            // Walidacja i zliczanie Multi-rabatów
+            // Multi-rabaty
             for (let k = 0; k < 4; k++) {
                 if (multiCounts[k] === 0) continue;
                 if (multiCounts[k] === 1) { total += multiCosts[k]; } 
@@ -339,11 +391,8 @@
             }
         }
 
-        // Rekonstrukcja najlepszego wyniku do wyœwietlenia
         let groups = [[], [], [], [], [], []];
-        if (bestAssignment) {
-            for(let j=0; j<n; j++) groups[bestAssignment[j]].push(items[j]);
-        }
+        if (bestAssignment) { for(let j=0; j<n; j++) groups[bestAssignment[j]].push(items[j]); }
         return { groups, bestTotal };
     }
 
@@ -363,70 +412,81 @@
     function display(best, allItems) {
         document.getElementById('total-price').innerText = format(best.bestTotal);
         let baseSum = allItems.reduce((a, b) => a + b.baseGrosze, 0);
-        document.getElementById('total-savings').innerText = "Klient zyskuje dzięki Tobie rabat: " + format(baseSum - best.bestTotal);
+        document.getElementById('total-savings').innerText = "Klient zyskuje łącznie rabat: " + format(baseSum - best.bestTotal);
 
         const grid = document.getElementById('order-grid');
         grid.innerHTML = '';
 
-        // Render: MULTI-RABATY
+        // MULTI-RABATY
         for (let i = 1; i <= 4; i++) {
             if (best.groups[i].length > 0) {
                 let res = getBundleCost(best.groups[i]);
                 const card = document.createElement('div');
                 card.className = 'order-card';
                 let itemsHtml = best.groups[i].map(item => `
-                    <li><div>${item.name} ${item.index ? `<span class="index-badge">Indeks: ${item.index}</span>` : ''}</div> <span>${format(item.baseGrosze)}</span></li>
+                    <li><div>${item.name} ${item.index ? `<span class="index-badge">SKU: ${item.index}</span>` : ''}</div> <span>${format(item.baseGrosze)}</span></li>
                 `).join('');
                 
                 card.innerHTML = `
                     <h3>🛒 Zestaw Multi-Rabat #${i} <span style="color:var(--success)">${format(res.total)}</span></h3>
-                    <p class="explain-text">Te produkty nabij wspólnie na jeden paragon (Promocja z rabatem na najtańszy).</p>
+                    <p class="explain-text">Te produkty nabij wspólnie na jeden paragon (Rabat z najtańszego).</p>
                     <ul class="item-list">${itemsHtml}</ul>
                     <div style="text-align:right; margin-top:10px;">
-                        <span class="discount-badge" style="background:#fef3c7; color:#b45309">Rabat odliczony z najtańszego: -${format(res.discount)}</span>
+                        <span class="discount-badge" style="background:#fef3c7; color:#b45309">Zniżka Multi: -${format(res.discount)}</span>
                     </div>
                 `;
                 grid.appendChild(card);
             }
         }
 
-        // Render: PROMOCJA PRALKA+SUSZARKA
+        // PARY PROMOCYJNE
         if (best.groups[5].length > 0) {
-            let cost5 = 0, discount5 = 0;
+            let totalCost5 = 0, totalDiscount5 = 0;
+            let promo40Items = best.groups[5].filter(it => it.type === 'promo40').sort((a, b) => b.baseGrosze - a.baseGrosze);
+
             let itemsHtml = best.groups[5].map(it => {
                 let p = it.baseGrosze;
-                let usedPromo = false;
-                if(it.type === 'washer') { p = Math.round(it.baseGrosze * 0.5); usedPromo = true; cost5 += p; discount5 += p; } 
-                else { cost5 += p; }
-                return `<li><div>${it.name} ${it.index ? `<span class="index-badge">Indeks: ${it.index}</span>` : ''} ${usedPromo ? '<span class="discount-badge" style="background:#dbeafe; color:#1e40af; border:none; padding: 2px 5px;">-50% Taniej</span>' : ''}</div> <span>${format(p)}</span></li>`;
+                let text = '';
+                if(it.type === 'washer') { p = Math.round(it.baseGrosze * 0.5); text = '-50% (Pralnictwo)'; } 
+                else if(it.type === 'hob') { p = Math.round(it.baseGrosze * 0.5); text = '-50% (Zabudowa)'; }
+                else if(it.type === 'promo40') {
+                    let idx = promo40Items.findIndex(x => x.id === it.id);
+                    if (idx % 2 !== 0) { p = Math.round(it.baseGrosze * 0.6); text = '-40% (Drugi prod.)'; }
+                }
+                
+                let discountVal = it.baseGrosze - p;
+                totalCost5 += p;
+                totalDiscount5 += discountVal;
+
+                return `<li><div>${it.name} ${it.index ? `<span class="index-badge">SKU: ${it.index}</span>` : ''} ${text ? `<span class="discount-badge" style="background:#dbeafe; color:#1e40af; border:none; padding: 2px 5px;">${text}</span>` : ''}</div> <span>${format(p)}</span></li>`;
             }).join('');
 
             const card = document.createElement('div');
             card.className = 'order-card special-card';
             card.innerHTML = `
-                <h3>🧺 Zestaw Pralnictwo <span style="color:var(--success)">${format(cost5)}</span></h3>
-                <p class="explain-text">Produkty z dedykowanej promocji (Pralka 50% taniej przy zakupie z suszarką).</p>
+                <h3>✨ Pakiety Zestawowe (Pary) <span style="color:var(--success)">${format(totalCost5)}</span></h3>
+                <p class="explain-text">Produkty połączone w dwupaki (Piekarnik+Płyta, Pralka+Suszarka, Drugi -40%).</p>
                 <ul class="item-list">${itemsHtml}</ul>
-                <div style="text-align:right; margin-top:10px;"><span class="discount-badge" style="background:#dbeafe; color:#1e40af">Zysk na pralce: -${format(discount5)}</span></div>
+                <div style="text-align:right; margin-top:10px;"><span class="discount-badge" style="background:#dbeafe; color:#1e40af">Oszczędność w pakietach: -${format(totalDiscount5)}</span></div>
             `;
             grid.appendChild(card);
         }
 
-        // Render: KODY/LUZEM
+        // KODY LUB OSOBNO
         if (best.groups[0].length > 0) {
             let groupSum = 0;
             let itemsHtml = best.groups[0].map(item => {
                 let price = (item.codeGrosze !== null && item.codeGrosze < item.baseGrosze) ? item.codeGrosze : item.baseGrosze;
                 let usedCode = item.codeGrosze !== null && item.codeGrosze < item.baseGrosze;
                 groupSum += price;
-                return `<li><div>${item.name} ${item.index ? `<span class="index-badge">Indeks: ${item.index}</span>` : ''} ${usedCode ? '<span class="discount-badge" style="background:#e0f2fe; color:#0369a1; border:none; padding: 2px 5px;">UŻYTO KODU</span>' : ''}</div> <span>${format(price)}</span></li>`;
+                return `<li><div>${item.name} ${item.index ? `<span class="index-badge">SKU: ${item.index}</span>` : ''} ${usedCode ? '<span class="discount-badge" style="background:#e0f2fe; color:#0369a1; border:none; padding: 2px 5px;">KOD - UŻYTO ZNIŻKI</span>' : ''}</div> <span>${format(price)}</span></li>`;
             }).join('');
 
             const card = document.createElement('div');
             card.className = 'order-card loose-card';
             card.innerHTML = `
                 <h3>🎟️ Produkty Osobne / Kody <span>${format(groupSum)}</span></h3>
-                <p class="explain-text">Te produkty opłaca się nabić osobno na kody (lub bez promocji, bo Multi się tu nie kalkuluje).</p>
+                <p class="explain-text">Nabij na kody zniżkowe lub pojedynczo (brak opłacalności wciskania ich do Multi).</p>
                 <ul class="item-list">${itemsHtml}</ul>
             `;
             grid.appendChild(card);
@@ -436,7 +496,6 @@
     function generatePDF(mode) {
         document.body.classList.remove('print-formal', 'print-simple');
         document.body.classList.add('print-' + mode);
-        
         document.getElementById('print-title').innerText = mode === 'formal' ? 'Wycena Zestawu - Media Expert' : 'Zestawienie Robocze';
         
         const now = new Date();
