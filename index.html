@@ -192,6 +192,7 @@
                 name: p.n || '', index: p.i || '', type: p.t || 'other', 
                 basePrice: p.b || '', codePrice: p.c || '', excluded: p.e || false
             }));
+            // Czyszczenie paska adresu po imporcie
             window.history.replaceState(null, '', window.location.pathname);
         } catch(e) { console.error("Nieprawidłowy link udostępniania."); }
     }
