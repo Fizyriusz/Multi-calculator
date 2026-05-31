@@ -90,6 +90,85 @@
         .index-badge { font-size: 0.75rem; color: var(--text-muted); background: var(--bg); padding: 2px 6px; border-radius: 4px; border: 1px solid var(--border); margin-left: 8px; font-family: monospace; }
         .loader { display: none; text-align: center; padding: 20px; font-weight: bold; color: var(--text-muted); }
 
+        /* --- STYL DLA PILLÓW PROMOCJI --- */
+        .promo-pills-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 4px;
+            justify-content: flex-start;
+        }
+        .promo-pill {
+            display: inline-block;
+            padding: 3px 8px;
+            margin: 1px;
+            font-size: 0.7rem;
+            font-weight: 600;
+            border-radius: 9999px;
+            border: 1px solid var(--border);
+            background: transparent;
+            color: var(--text-muted);
+            cursor: pointer;
+            transition: all 0.2s ease;
+            user-select: none;
+        }
+        .promo-pill:hover {
+            border-color: var(--text-main);
+            color: var(--text-main);
+        }
+        /* Aktywne stany */
+        .promo-pill.active-washer {
+            background: #e0f2fe;
+            color: #0369a1;
+            border-color: #7dd3fc;
+        }
+        .promo-pill.active-dryer {
+            background: #f0fdf4;
+            color: #15803d;
+            border-color: #86efac;
+        }
+        .promo-pill.active-oven {
+            background: #fdf2f8;
+            color: #b91c1c;
+            border-color: #fbcfe8;
+        }
+        .promo-pill.active-hob {
+            background: #fff7ed;
+            color: #c2410c;
+            border-color: #ffedd5;
+        }
+        .promo-pill.active-promo40 {
+            background: #faf5ff;
+            color: #6b21a8;
+            border-color: #e9d5ff;
+        }
+
+        /* Dark mode dla aktywacji */
+        body.dark-mode .promo-pill.active-washer {
+            background: #0369a1;
+            color: #e0f2fe;
+            border-color: #0284c7;
+        }
+        body.dark-mode .promo-pill.active-dryer {
+            background: #15803d;
+            color: #f0fdf4;
+            border-color: #16a34a;
+        }
+        body.dark-mode .promo-pill.active-oven {
+            background: #b91c1c;
+            color: #fdf2f8;
+            border-color: #dc2626;
+        }
+        body.dark-mode .promo-pill.active-hob {
+            background: #c2410c;
+            color: #fff7ed;
+            border-color: #ea580c;
+        }
+        body.dark-mode .promo-pill.active-promo40 {
+            background: #6b21a8;
+            color: #faf5ff;
+            border-color: #8b5cf6;
+        }
+
         /* --- STYLE DO WYDRUKU PDF --- */
         .print-header, .print-footer { display: none; }
         @media print {
@@ -138,10 +217,10 @@
                 <tr>
                     <th style="width: 30px;"></th>
                     <th>Nazwa produktu</th>
-                    <th style="width: 12%;">Indeks</th>
-                    <th style="width: 18%;">Typ Promocji Dedyk.</th>
-                    <th style="width: 12%;">Cena wyj. (zł)</th>
-                    <th style="width: 12%;">Po kodzie (zł)</th>
+                    <th style="width: 10%;">Indeks</th>
+                    <th style="width: 25%;">Typ Promocji Dedyk.</th>
+                    <th style="width: 11%;">Cena wyj. (zł)</th>
+                    <th style="width: 11%;">Po kodzie (zł)</th>
                     <th class="checkbox-cell" style="width: 8%; font-size:0.75rem;">Wyklucz<br>z Multi</th>
                     <th style="width: 40px;"></th>
                 </tr>
@@ -187,27 +266,40 @@
     if (params.has('d')) {
         try {
             const decoded = JSON.parse(decodeURIComponent(atob(params.get('d'))));
-            initialProducts = decoded.map(p => ({
-                id: Date.now() + Math.random(),
-                name: p.n || '', index: p.i || '', type: p.t || 'other', 
-                basePrice: p.b || '', codePrice: p.c || '', excluded: p.e || false
-            }));
+            initialProducts = decoded.map(p => {
+                const types = p.ts || (p.t && p.t !== 'other' ? [p.t] : []);
+                return {
+                    id: Date.now() + Math.random(),
+                    name: p.n || '', index: p.i || '', types: types, 
+                    basePrice: p.b || '', codePrice: p.c || '', excluded: p.e || false
+                };
+            });
             // Czyszczenie paska adresu po imporcie
             window.history.replaceState(null, '', window.location.pathname);
         } catch(e) { console.error("Nieprawidłowy link udostępniania."); }
     }
 
     // DANE
-    let products = initialProducts || JSON.parse(localStorage.getItem('me_products_v5')) || [
-        { id: Date.now(), name: '', index: '', type: 'other', basePrice: '', codePrice: '', excluded: false }
-    ];
+    let loadedProducts = initialProducts || JSON.parse(localStorage.getItem('me_products_v5'));
+    if (!loadedProducts) {
+        loadedProducts = [
+            { id: Date.now(), name: '', index: '', types: [], basePrice: '', codePrice: '', excluded: false }
+        ];
+    }
+    // Konwersja i migracja formatów
+    loadedProducts.forEach(p => {
+        if (!p.types) {
+            p.types = (p.type && p.type !== 'other') ? [p.type] : [];
+        }
+    });
+    let products = loadedProducts;
 
     function save() { localStorage.setItem('me_products_v5', JSON.stringify(products)); }
 
     // UDOSTĘPNIANIE
     function shareBasket() {
         const minimalData = products.map(p => ({
-            n: p.name, i: p.index, t: p.type, b: p.basePrice, c: p.codePrice, e: p.excluded
+            n: p.name, i: p.index, ts: p.types, b: p.basePrice, c: p.codePrice, e: p.excluded
         }));
         const encoded = btoa(encodeURIComponent(JSON.stringify(minimalData)));
         const url = window.location.origin + window.location.pathname + '?d=' + encoded;
@@ -246,19 +338,24 @@
             tr.addEventListener('dragleave', handleDragLeave);
             tr.addEventListener('drop', (e) => handleDrop(e, idx));
 
+            const wActive = p.types.includes('washer') ? 'active-washer' : '';
+            const dActive = p.types.includes('dryer') ? 'active-dryer' : '';
+            const oActive = p.types.includes('oven') ? 'active-oven' : '';
+            const hActive = p.types.includes('hob') ? 'active-hob' : '';
+            const p40Active = p.types.includes('promo40') ? 'active-promo40' : '';
+
             tr.innerHTML = `
                 <td class="drag-handle" title="Przeciągnij">☰</td>
                 <td><input type="text" placeholder="np. Piekarnik Electrolux" value="${p.name}" oninput="update(${p.id}, 'name', this.value)"></td>
                 <td><input type="text" placeholder="123456" value="${p.index || ''}" oninput="update(${p.id}, 'index', this.value)"></td>
                 <td>
-                    <select onchange="update(${p.id}, 'type', this.value)">
-                        <option value="other" ${p.type === 'other' || !p.type ? 'selected' : ''}>Brak / Standard</option>
-                        <option value="washer" ${p.type === 'washer' ? 'selected' : ''}>Pralka (-50% z susz.)</option>
-                        <option value="dryer" ${p.type === 'dryer' ? 'selected' : ''}>Suszarka (do pralki)</option>
-                        <option value="oven" ${p.type === 'oven' ? 'selected' : ''}>Piekarnik (do płyty)</option>
-                        <option value="hob" ${p.type === 'hob' ? 'selected' : ''}>Płyta (-50% z piek.)</option>
-                        <option value="promo40" ${p.type === 'promo40' ? 'selected' : ''}>Drugi produkt -40%</option>
-                    </select>
+                    <div class="promo-pills-container">
+                        <span class="promo-pill ${wActive}" onclick="togglePromo(${p.id}, 'washer')" title="Pralka (-50% z suszarką)">Pralka -50%</span>
+                        <span class="promo-pill ${dActive}" onclick="togglePromo(${p.id}, 'dryer')" title="Suszarka (do pralki)">Suszarka</span>
+                        <span class="promo-pill ${oActive}" onclick="togglePromo(${p.id}, 'oven')" title="Piekarnik (do płyty)">Piekarnik</span>
+                        <span class="promo-pill ${hActive}" onclick="togglePromo(${p.id}, 'hob')" title="Płyta (-50% z piekarnikiem)">Płyta -50%</span>
+                        <span class="promo-pill ${p40Active}" onclick="togglePromo(${p.id}, 'promo40')" title="Drugi produkt -40%">Drugi -40%</span>
+                    </div>
                 </td>
                 <td><input type="number" step="0.01" placeholder="0.00" value="${p.basePrice}" oninput="update(${p.id}, 'basePrice', this.value)"></td>
                 <td><input type="number" step="0.01" placeholder="brak" value="${p.codePrice}" oninput="update(${p.id}, 'codePrice', this.value)"></td>
@@ -269,16 +366,29 @@
         });
     }
 
-    function addProduct() { products.push({ id: Date.now(), name: '', index: '', type: 'other', basePrice: '', codePrice: '', excluded: false }); render(); save(); }
+    function addProduct() { products.push({ id: Date.now(), name: '', index: '', types: [], basePrice: '', codePrice: '', excluded: false }); render(); save(); }
     function remove(id) { products = products.filter(p => p.id !== id); render(); save(); }
     function update(id, field, value) { 
         const p = products.find(p => p.id === id); 
         if (p) p[field] = value; 
         save(); hidePrintButtons();
     }
+    function togglePromo(id, promoType) {
+        const p = products.find(p => p.id === id);
+        if (p) {
+            p.types = p.types || [];
+            const idx = p.types.indexOf(promoType);
+            if (idx > -1) {
+                p.types.splice(idx, 1);
+            } else {
+                p.types.push(promoType);
+            }
+            save(); render(); hidePrintButtons();
+        }
+    }
     function clearData() {
         if(confirm("Wyczyścić dane i usunąć wyliczenia?")) {
-            products = [{ id: Date.now(), name: '', index: '', type: 'other', basePrice: '', codePrice: '', excluded: false }];
+            products = [{ id: Date.now(), name: '', index: '', types: [], basePrice: '', codePrice: '', excluded: false }];
             render(); save(); document.getElementById('results').style.display = 'none'; hidePrintButtons();
         }
     }
@@ -289,13 +399,14 @@
 
     function runCalculation() {
         const validProducts = products.filter(p => p.basePrice > 0).map(p => ({
-            id: p.id, name: p.name || "Produkt", index: p.index || "", type: p.type || "other",
+            id: p.id, name: p.name || "Produkt", index: p.index || "", 
+            types: p.types || [],
             baseGrosze: Math.round(parseFloat(p.basePrice) * 100),
             codeGrosze: p.codePrice ? Math.round(parseFloat(p.codePrice) * 100) : null,
             excluded: p.excluded
         }));
         if (validProducts.length === 0) return alert("Wpisz ceny wyjściowe produktów!");
-        if (validProducts.length > 12) return alert("Zoptymalizowano dla max 12 produktów jednocześnie ze względu na limit kombinacji.");
+        if (validProducts.length > 15) return alert("Zoptymalizowano dla max 15 produktów jednocześnie.");
 
         document.getElementById('loader').style.display = 'block';
         document.getElementById('results').style.display = 'none';
@@ -314,85 +425,155 @@
         const n = items.length;
         let bestTotal = Infinity;
         let bestAssignment = null;
-        const states = 6; // 0:Luzem/Kod, 1-4:Multi, 5:Pary Specjalne (Pralki, Piekarniki, 40%)
-        const totalCombos = Math.pow(states, n);
-        let assignment = new Array(n);
 
-        for (let i = 0; i < totalCombos; i++) {
-            let current = i;
-            let possible = true;
-            
-            for (let j = 0; j < n; j++) {
-                let s = current % states;
-                current = Math.floor(current / states);
-                
-                if (items[j].excluded && s >= 1 && s <= 4) { possible = false; break; }
-                if (s === 5 && items[j].type === 'other') { possible = false; break; }
-                assignment[j] = s;
+        // Określamy dozwolone stany dla każdego produktu
+        const allowedStates = items.map(it => {
+            const states = [0]; // Zawsze można kupić osobno/z kodem
+            if (!it.excluded) {
+                states.push(1, 2, 3, 4); // Grupy Multi
             }
-            if (!possible) continue;
+            if (it.types && it.types.length > 0) {
+                it.types.forEach(t => {
+                    if (t) states.push(t);
+                });
+            }
+            return states;
+        });
 
-            let total = 0;
-            let multiCosts = [0,0,0,0], multiMins = [Infinity,Infinity,Infinity,Infinity], multiCounts = [0,0,0,0];
-            let group5 = { washer: [], dryer: [], oven: [], hob: [], promo40: [] };
+        // Dolny szacunek kosztu pozostałych produktów do szybkiego odcinania (pruningu)
+        const minCosts = items.map(it => {
+            if (!it.excluded) return 100; // W Multi-rabatach cena może spaść do 1 zł (100 groszy)
+            let minC = it.baseGrosze * 0.5; // Maksymalny rabat specjalny to -50%
+            if (it.codeGrosze !== null && it.codeGrosze < minC) {
+                minC = it.codeGrosze;
+            }
+            return Math.max(100, Math.min(it.baseGrosze, minC));
+        });
 
-            for (let j = 0; j < n; j++) {
-                let s = assignment[j];
-                let it = items[j];
+        const suffixMinCost = new Array(n + 1).fill(0);
+        for (let i = n - 1; i >= 0; i--) {
+            suffixMinCost[i] = suffixMinCost[i + 1] + minCosts[i];
+        }
+
+        const currentAssignment = new Array(n);
+        const multiCosts = [0, 0, 0, 0];
+        const multiMins = [Infinity, Infinity, Infinity, Infinity];
+        const multiCounts = [0, 0, 0, 0];
+        
+        const specialLists = {
+            washer: [],
+            dryer: [],
+            oven: [],
+            hob: [],
+            promo40: []
+        };
+        
+        let currentLooseCost = 0;
+
+        function dfs(idx, currentCostBound) {
+            // Pruning: Jeśli aktualny dolny szacunek kosztu przekracza dotychczasowy najlepszy wynik, przerywamy
+            if (currentCostBound + suffixMinCost[idx] >= bestTotal) {
+                return;
+            }
+
+            if (idx === n) {
+                // Weryfikacja warunków dla par specjalnych
+                if (specialLists.washer.length !== specialLists.dryer.length) return;
+                if (specialLists.oven.length !== specialLists.hob.length) return;
+                if (specialLists.promo40.length % 2 !== 0) return;
+
+                let total = currentLooseCost;
+
+                // Obliczamy koszt par specjalnych
+                total += specialLists.washer.reduce((acc, val) => acc + Math.round(val * 0.5), 0);
+                total += specialLists.dryer.reduce((acc, val) => acc + val, 0);
+                total += specialLists.oven.reduce((acc, val) => acc + val, 0);
+                total += specialLists.hob.reduce((acc, val) => acc + Math.round(val * 0.5), 0);
+                
+                if (specialLists.promo40.length > 0) {
+                    const sortedPromo40 = [...specialLists.promo40].sort((a, b) => b - a);
+                    for (let p = 0; p < sortedPromo40.length; p += 2) {
+                        total += sortedPromo40[p] + Math.round(sortedPromo40[p+1] * 0.6);
+                    }
+                }
+
+                // Obliczamy koszt grup Multi
+                for (let k = 0; k < 4; k++) {
+                    if (multiCounts[k] === 0) continue;
+                    if (multiCounts[k] === 1) {
+                        total += multiCosts[k];
+                    } else {
+                        let c = multiCounts[k], min = multiMins[k], d = 0;
+                        if (c === 2) d = Math.round(min * 0.30);
+                        else if (c === 3) d = Math.round(min * 0.55);
+                        else if (c === 4) d = Math.round(min * 0.80);
+                        else if (c >= 5) d = min - 100;
+                        total += (multiCosts[k] - d);
+                    }
+                }
+
+                if (total < bestTotal) {
+                    bestTotal = total;
+                    bestAssignment = [...currentAssignment];
+                }
+                return;
+            }
+
+            const it = items[idx];
+            const states = allowedStates[idx];
+
+            for (let i = 0; i < states.length; i++) {
+                const s = states[i];
+                currentAssignment[idx] = s;
+
                 if (s === 0) {
-                    total += (it.codeGrosze !== null && it.codeGrosze < it.baseGrosze) ? it.codeGrosze : it.baseGrosze;
+                    const cost = (it.codeGrosze !== null && it.codeGrosze < it.baseGrosze) ? it.codeGrosze : it.baseGrosze;
+                    currentLooseCost += cost;
+                    dfs(idx + 1, currentCostBound + cost);
+                    currentLooseCost -= cost;
                 } else if (s >= 1 && s <= 4) {
-                    let k = s - 1;
+                    const k = s - 1;
+                    const prevCost = multiCosts[k];
+                    const prevMin = multiMins[k];
+                    const prevCount = multiCounts[k];
+
                     multiCosts[k] += it.baseGrosze;
                     if (it.baseGrosze < multiMins[k]) multiMins[k] = it.baseGrosze;
                     multiCounts[k]++;
-                } else if (s === 5) {
-                    group5[it.type].push(it.baseGrosze);
+
+                    dfs(idx + 1, currentCostBound + 100);
+
+                    multiCosts[k] = prevCost;
+                    multiMins[k] = prevMin;
+                    multiCounts[k] = prevCount;
+                } else {
+                    specialLists[s].push(it.baseGrosze);
+                    let est = it.baseGrosze;
+                    if (s === 'washer' || s === 'hob') est = Math.round(it.baseGrosze * 0.5);
+                    if (s === 'promo40') est = Math.round(it.baseGrosze * 0.6);
+                    dfs(idx + 1, currentCostBound + est);
+                    specialLists[s].pop();
                 }
-            }
-
-            // Weryfikacja State 5 - Muszą tworzyć idealne pary
-            if (group5.washer.length !== group5.dryer.length) continue;
-            if (group5.oven.length !== group5.hob.length) continue;
-            if (group5.promo40.length % 2 !== 0) continue;
-
-            // Obliczenia dla State 5 (Pary Dedykowane)
-            let cost5 = 0;
-            cost5 += group5.washer.reduce((acc, val) => acc + Math.round(val * 0.5), 0);
-            cost5 += group5.dryer.reduce((acc, val) => acc + val, 0);
-            cost5 += group5.oven.reduce((acc, val) => acc + val, 0);
-            cost5 += group5.hob.reduce((acc, val) => acc + Math.round(val * 0.5), 0);
-            
-            if (group5.promo40.length > 0) {
-                group5.promo40.sort((a, b) => b - a); // Sortuj malejąco, by -40% weszło na tańszy z pary
-                for (let p = 0; p < group5.promo40.length; p += 2) {
-                    cost5 += group5.promo40[p] + Math.round(group5.promo40[p+1] * 0.6);
-                }
-            }
-            total += cost5;
-
-            // Multi-rabaty
-            for (let k = 0; k < 4; k++) {
-                if (multiCounts[k] === 0) continue;
-                if (multiCounts[k] === 1) { total += multiCosts[k]; } 
-                else {
-                    let c = multiCounts[k], min = multiMins[k], d = 0;
-                    if (c === 2) d = Math.round(min * 0.30);
-                    else if (c === 3) d = Math.round(min * 0.55);
-                    else if (c === 4) d = Math.round(min * 0.80);
-                    else if (c >= 5) d = min - 100;
-                    total += (multiCosts[k] - d);
-                }
-            }
-
-            if (total < bestTotal) {
-                bestTotal = total;
-                bestAssignment = [...assignment];
             }
         }
 
-        let groups = [[], [], [], [], [], []];
-        if (bestAssignment) { for(let j=0; j<n; j++) groups[bestAssignment[j]].push(items[j]); }
+        dfs(0, 0);
+
+        const groups = [[], [], [], [], [], []];
+        if (bestAssignment) {
+            for (let j = 0; j < n; j++) {
+                const s = bestAssignment[j];
+                const it = items[j];
+                if (s === 0) {
+                    groups[0].push(it);
+                } else if (s >= 1 && s <= 4) {
+                    groups[s].push(it);
+                } else {
+                    it.assignedRole = s;
+                    groups[5].push(it);
+                }
+            }
+        }
         return { groups, bestTotal };
     }
 
@@ -442,14 +623,14 @@
         // PARY PROMOCYJNE
         if (best.groups[5].length > 0) {
             let totalCost5 = 0, totalDiscount5 = 0;
-            let promo40Items = best.groups[5].filter(it => it.type === 'promo40').sort((a, b) => b.baseGrosze - a.baseGrosze);
+            let promo40Items = best.groups[5].filter(it => it.assignedRole === 'promo40').sort((a, b) => b.baseGrosze - a.baseGrosze);
 
             let itemsHtml = best.groups[5].map(it => {
                 let p = it.baseGrosze;
                 let text = '';
-                if(it.type === 'washer') { p = Math.round(it.baseGrosze * 0.5); text = '-50% (Pralnictwo)'; } 
-                else if(it.type === 'hob') { p = Math.round(it.baseGrosze * 0.5); text = '-50% (Zabudowa)'; }
-                else if(it.type === 'promo40') {
+                if(it.assignedRole === 'washer') { p = Math.round(it.baseGrosze * 0.5); text = '-50% (Pralnictwo)'; } 
+                else if(it.assignedRole === 'hob') { p = Math.round(it.baseGrosze * 0.5); text = '-50% (Zabudowa)'; }
+                else if(it.assignedRole === 'promo40') {
                     let idx = promo40Items.findIndex(x => x.id === it.id);
                     if (idx % 2 !== 0) { p = Math.round(it.baseGrosze * 0.6); text = '-40% (Drugi prod.)'; }
                 }
