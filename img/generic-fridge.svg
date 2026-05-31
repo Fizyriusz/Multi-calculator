@@ -1,0 +1,32 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 600" width="100%" height="100%">
+  <!-- Refrigerator Body -->
+  <rect x="10" y="10" width="280" height="580" rx="10" fill="#2d3748" stroke="#1a202c" stroke-width="4"/>
+  <!-- Metallic Front Gradient Door -->
+  <rect x="16" y="16" width="268" height="568" rx="6" fill="url(#fridge-steel)" />
+  <!-- Door Split (Top/Bottom Freezer type) -->
+  <line x1="16" y1="360" x2="284" y2="360" stroke="#333333" stroke-width="3"/>
+  <!-- Top Door Handle -->
+  <rect x="35" y="120" width="12" height="180" rx="3" fill="url(#handle-metal)" stroke="#333" stroke-width="1"/>
+  <!-- Bottom Door Handle -->
+  <rect x="35" y="380" width="12" height="120" rx="3" fill="url(#handle-metal)" stroke="#333" stroke-width="1"/>
+  <!-- Water Dispenser / Smart Panel on Right side -->
+  <rect x="150" y="100" width="80" height="120" rx="5" fill="#1a202c" stroke="#4a5568" stroke-width="2"/>
+  <rect x="160" y="110" width="60" height="40" rx="2" fill="#0d1117"/>
+  <text x="190" y="134" fill="#00e5ff" font-family="Courier New, monospace" font-size="16" text-anchor="middle" font-weight="bold">4°C / -18°</text>
+  <!-- Dispenser lever -->
+  <path d="M 180,180 L 180,205 Q 180,210 185,210 L 195,210 Q 200,210 200,205 L 200,180" fill="none" stroke="#718096" stroke-width="3"/>
+  <defs>
+    <linearGradient id="fridge-steel" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#4a5568"/>
+      <stop offset="25%" stop-color="#718096"/>
+      <stop offset="50%" stop-color="#a0aec0"/>
+      <stop offset="75%" stop-color="#cbd5e0"/>
+      <stop offset="100%" stop-color="#4a5568"/>
+    </linearGradient>
+    <linearGradient id="handle-metal" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#ffffff"/>
+      <stop offset="50%" stop-color="#cbd5e0"/>
+      <stop offset="100%" stop-color="#718096"/>
+    </linearGradient>
+  </defs>
+</svg>

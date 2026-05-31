@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Kalkulator Zestawów ME PRO</title>
+    <link rel="manifest" href="manifest.json">
     <style>
         :root {
             --me-yellow: #ffe600;
@@ -192,6 +193,481 @@
             body.print-simple .order-card h3 { border-bottom: none !important; font-size: 1.1rem !important; margin-bottom: 5px; }
             body.print-simple .summary-box { border: none !important; border-top: 2px solid #000 !important; border-bottom: 2px solid #000 !important; }
         }
+
+        /* --- NAWIGACJA ZAKŁADEK (TABS) --- */
+        .tab-bar {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 25px;
+            border-bottom: 2px solid var(--border);
+            padding-bottom: 10px;
+        }
+        .tab-btn {
+            background: transparent;
+            color: var(--text-muted);
+            border: none;
+            padding: 10px 22px;
+            font-size: 1.05rem;
+            font-weight: 600;
+            cursor: pointer;
+            border-radius: 6px;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .tab-btn:hover {
+            color: var(--text-main);
+            background: var(--row-hover);
+        }
+        .tab-btn.active {
+            color: #000;
+            background: var(--me-yellow);
+            box-shadow: 0 4px 10px rgba(255, 230, 0, 0.3);
+        }
+        body.dark-mode .tab-btn.active {
+            color: #000;
+            background: var(--me-yellow);
+            box-shadow: 0 4px 10px rgba(204, 166, 0, 0.4);
+        }
+        .tab-icon {
+            font-size: 1.2rem;
+        }
+
+        /* --- WIZUALIZATOR KUCHNI LAYOUT --- */
+        .visualizer-container {
+            display: flex;
+            gap: 25px;
+            margin-top: 20px;
+        }
+        .vis-warehouse {
+            flex: 0 0 28%;
+            background: var(--card);
+            border: 2px solid var(--border);
+            border-radius: 12px;
+            padding: 20px;
+            max-height: 750px;
+            overflow-y: auto;
+            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1);
+        }
+        .vis-studio {
+            flex: 1;
+            background: var(--card);
+            border: 2px solid var(--border);
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1);
+            display: flex;
+            flex-direction: column;
+        }
+        .vis-subtitle {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            margin-top: -10px;
+            margin-bottom: 20px;
+        }
+        .vis-inventory-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+        .vis-item-card {
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 12px;
+            background: var(--bg);
+            cursor: pointer;
+            transition: all 0.2s ease;
+            position: relative;
+            user-select: none;
+        }
+        .vis-item-card:hover {
+            border-color: var(--text-main);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);
+        }
+        .vis-item-card.selected {
+            border-color: var(--me-yellow);
+            border-width: 2px;
+            box-shadow: 0 0 10px rgba(255, 230, 0, 0.4);
+            background: var(--row-hover);
+        }
+        body.dark-mode .vis-item-card.selected {
+            box-shadow: 0 0 10px rgba(204, 166, 0, 0.4);
+        }
+        .vis-item-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 6px;
+        }
+        .vis-item-name {
+            font-weight: 600;
+            font-size: 0.95rem;
+            color: var(--text-main);
+            margin-right: 20px;
+        }
+        .vis-item-status {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            flex-shrink: 0;
+            margin-top: 3px;
+        }
+        .vis-status-in-store { background-color: var(--danger); }
+        .vis-status-placed { background-color: var(--success); }
+        .vis-item-sku {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            font-family: monospace;
+            background: var(--card);
+            padding: 2px 6px;
+            border-radius: 4px;
+            border: 1px solid var(--border);
+            display: inline-block;
+        }
+        .vis-item-meta {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 8px;
+        }
+        .vis-item-price {
+            font-size: 0.85rem;
+            font-weight: bold;
+            color: var(--text-main);
+        }
+        .vis-type-select {
+            font-size: 0.75rem;
+            padding: 3px 6px;
+            width: auto;
+            border: 1px solid var(--border);
+            border-radius: 4px;
+            background: var(--card);
+            color: var(--text-main);
+        }
+
+        /* --- ELEWACJA KUCHENNA (STUDIO) --- */
+        .kitchen-elevation-wrapper {
+            background: #cbd5e1;
+            padding: 40px 20px 20px 20px;
+            border-radius: 10px;
+            border: 1px solid #94a3b8;
+            display: flex;
+            justify-content: center;
+            align-items: flex-end;
+            margin-top: 10px;
+            min-height: 520px;
+        }
+        body.dark-mode .kitchen-elevation-wrapper {
+            background: #1e293b;
+            border-color: #334155;
+        }
+        .kitchen-grid {
+            display: flex;
+            gap: 12px;
+            align-items: flex-end;
+        }
+        .kitchen-col {
+            display: flex;
+            flex-direction: column;
+            width: 170px;
+            flex-shrink: 0;
+        }
+        .kitchen-col.base-col {
+            width: 250px;
+        }
+        .cabinet {
+            background: #334155;
+            border: 1px solid #1e293b;
+            border-radius: 4px;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.15);
+            box-sizing: border-box;
+        }
+        body.dark-mode .cabinet {
+            background: #0f172a;
+            border-color: #334155;
+        }
+        .tall-cabinet {
+            height: 480px;
+            padding: 10px;
+            gap: 10px;
+        }
+        .upper-cabinet {
+            height: 140px;
+            padding: 10px;
+            border-bottom-left-radius: 0;
+            border-bottom-right-radius: 0;
+        }
+        .undercounter-cabinet {
+            height: 165px;
+            padding: 10px;
+            border-top-left-radius: 0;
+            border-top-right-radius: 0;
+        }
+        .cabinet-door {
+            background: #475569;
+            border: 1px solid #334155;
+            border-radius: 2px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+        }
+        body.dark-mode .cabinet-door {
+            background: #1e293b;
+            border-color: #0f172a;
+        }
+        .cabinet-door::after {
+            content: '';
+            position: absolute;
+            background: #94a3b8;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.2);
+            border-radius: 2px;
+        }
+        .top-fridge-door { height: 70px; }
+        .top-fridge-door::after { width: 4px; height: 35px; right: 10px; }
+        .top-door { height: 70px; }
+        .top-door::after { width: 35px; height: 4px; bottom: 8px; }
+        .bottom-drawer { height: 100px; }
+        .bottom-drawer::after { width: 60px; height: 4px; top: 15px; }
+        .backsplash {
+            height: 160px;
+            background: #e2e8f0;
+            border-left: 1px solid #cbd5e1;
+            border-right: 1px solid #cbd5e1;
+            position: relative;
+            box-sizing: border-box;
+            background-image: 
+                linear-gradient(to right, rgba(0,0,0,0.05) 1px, transparent 1px),
+                linear-gradient(to bottom, rgba(0,0,0,0.05) 1px, transparent 1px);
+            background-size: 40px 20px;
+        }
+        body.dark-mode .backsplash {
+            background: #334155;
+            border-color: #475569;
+            background-image: 
+                linear-gradient(to right, rgba(255,255,255,0.05) 1px, transparent 1px),
+                linear-gradient(to bottom, rgba(255,255,255,0.05) 1px, transparent 1px);
+        }
+        .countertop {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 15px;
+            background: #d97706;
+            border-top: 1px solid #b45309;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            display: flex;
+            justify-content: center;
+            z-index: 10;
+        }
+        .cabinet-slot {
+            border: 2px dashed #94a3b8;
+            border-radius: 4px;
+            background: rgba(0,0,0,0.1);
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+            box-sizing: border-box;
+            overflow: hidden;
+            width: 100%;
+        }
+        body.dark-mode .cabinet-slot {
+            border-color: #475569;
+            background: rgba(255,255,255,0.05);
+        }
+        #slot-fridge { height: 380px; }
+        #slot-microwave { height: 100px; }
+        #slot-oven { height: 160px; }
+        #slot-hood { height: 110px; }
+        #slot-hob { 
+            position: absolute; 
+            bottom: 12px; 
+            left: 50%; 
+            transform: translateX(-50%); 
+            width: 200px; 
+            height: 25px; 
+            border-radius: 3px; 
+            z-index: 15;
+            background: #111;
+            border: 1.5px solid #444;
+        }
+        #slot-dishwasher { height: 145px; }
+        .slot-label {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            font-weight: bold;
+            text-align: center;
+            pointer-events: none;
+            z-index: 2;
+            padding: 5px;
+        }
+        .slot-empty-visual {
+            position: absolute;
+            top: 10px; right: 10px; bottom: 10px; left: 10px;
+            border: 1px solid rgba(0,0,0,0.05);
+            background: rgba(0,0,0,0.02);
+            pointer-events: none;
+            border-radius: 2px;
+        }
+        body.dark-mode .slot-empty-visual {
+            border-color: rgba(255,255,255,0.05);
+            background: rgba(255,255,255,0.01);
+        }
+        .cabinet-slot.pulse-target {
+            border-color: var(--success);
+            box-shadow: 0 0 12px rgba(16, 185, 129, 0.6);
+            background: rgba(16, 185, 129, 0.15) !important;
+            cursor: pointer;
+            animation: pulse-green 1.5s infinite ease-in-out;
+        }
+        @keyframes pulse-green {
+            0% { opacity: 0.8; box-shadow: 0 0 4px rgba(16, 185, 129, 0.4); }
+            50% { opacity: 1; box-shadow: 0 0 16px rgba(16, 185, 129, 0.7); }
+            100% { opacity: 0.8; box-shadow: 0 0 4px rgba(16, 185, 129, 0.4); }
+        }
+        .slot-content {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 5;
+            background: var(--card);
+        }
+        .slot-content img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            display: block;
+        }
+        .slot-remove-btn {
+            position: absolute;
+            top: 4px;
+            right: 4px;
+            background: rgba(239, 68, 68, 0.9);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 22px;
+            height: 22px;
+            font-size: 0.8rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 10;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+            transition: transform 0.2s ease;
+        }
+        .slot-remove-btn:hover {
+            transform: scale(1.1);
+            background: rgb(220, 38, 38);
+        }
+        #slot-hob .slot-label {
+            font-size: 0.65rem;
+            padding: 0;
+            line-height: 25px;
+        }
+        #slot-hob.pulse-target {
+            animation: pulse-green-flat 1.5s infinite ease-in-out;
+        }
+        @keyframes pulse-green-flat {
+            0% { opacity: 0.8; box-shadow: 0 0 2px rgba(16, 185, 129, 0.4); }
+            50% { opacity: 1; box-shadow: 0 0 10px rgba(16, 185, 129, 0.8); }
+            100% { opacity: 0.8; box-shadow: 0 0 2px rgba(16, 185, 129, 0.4); }
+        }
+        .slot-product-overlay {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: rgba(0, 0, 0, 0.7);
+            color: #fff;
+            font-size: 0.65rem;
+            text-align: center;
+            padding: 3px 5px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            pointer-events: none;
+        }
+        #slot-hob .slot-product-overlay {
+            display: none;
+        }
+
+        /* --- STYLE DO DRUKU DLA WIZUALIZACJI --- */
+        .print-kitchen-section {
+            display: none;
+            break-inside: avoid;
+            margin-top: 30px;
+            text-align: center;
+            border-top: 2px solid #000;
+            padding-top: 20px;
+        }
+        @media print {
+            .print-kitchen-section.active {
+                display: block !important;
+            }
+            .print-kitchen-section h3 {
+                margin-top: 0;
+                margin-bottom: 15px;
+                font-size: 1.2rem;
+                text-transform: uppercase;
+                color: #000 !important;
+            }
+            .print-kitchen-section .kitchen-elevation-wrapper {
+                -webkit-print-color-adjust: exact !important;
+                print-color-adjust: exact !important;
+                background: #cbd5e1 !important;
+                border: 1px solid #94a3b8 !important;
+                display: flex !important;
+                justify-content: center !important;
+                align-items: flex-end !important;
+                padding: 30px 15px 15px 15px !important;
+                min-height: 400px !important;
+            }
+            body.dark-mode .print-kitchen-section .kitchen-elevation-wrapper {
+                background: #cbd5e1 !important;
+                border-color: #94a3b8 !important;
+            }
+            .print-kitchen-section .cabinet {
+                background: #334155 !important;
+                border: 1px solid #1e293b !important;
+            }
+            .print-kitchen-section .cabinet-door {
+                background: #475569 !important;
+                border: 1px solid #334155 !important;
+            }
+            .print-kitchen-section .cabinet-slot {
+                border: 1.5px dashed #94a3b8 !important;
+                background: rgba(0,0,0,0.05) !important;
+            }
+            .print-kitchen-section .slot-content {
+                background: #fff !important;
+            }
+            .print-kitchen-section .slot-remove-btn {
+                display: none !important;
+            }
+            .print-kitchen-section .countertop {
+                background: #d97706 !important;
+                border-top: 1px solid #b45309 !important;
+            }
+            .print-kitchen-section .backsplash {
+                background: #e2e8f0 !important;
+                background-image: 
+                    linear-gradient(to right, rgba(0,0,0,0.05) 1px, transparent 1px),
+                    linear-gradient(to bottom, rgba(0,0,0,0.05) 1px, transparent 1px) !important;
+            }
+        }
     </style>
 </head>
 <body>
@@ -211,40 +687,143 @@
         </div>
     </header>
 
-    <div class="no-print">
-        <table class="product-table">
-            <thead>
-                <tr>
-                    <th style="width: 30px;"></th>
-                    <th>Nazwa produktu</th>
-                    <th style="width: 10%;">Indeks</th>
-                    <th style="width: 25%;">Typ Promocji Dedyk.</th>
-                    <th style="width: 11%;">Cena wyj. (zł)</th>
-                    <th style="width: 11%;">Po kodzie (zł)</th>
-                    <th class="checkbox-cell" style="width: 8%; font-size:0.75rem;">Wyklucz<br>z Multi</th>
-                    <th style="width: 40px;"></th>
-                </tr>
-            </thead>
-            <tbody id="product-body"></tbody>
-        </table>
+    <div class="tab-bar no-print">
+        <button id="tab-btn-calculator" class="tab-btn active" onclick="switchView('calculator')">
+            <span class="tab-icon">📊</span> Kalkulator Zestawów
+        </button>
+        <button id="tab-btn-visualizer" class="tab-btn" onclick="switchView('visualizer')">
+            <span class="tab-icon">🍳</span> Wizualizator Elewacji 2D
+        </button>
+    </div>
 
-        <div class="actions">
-            <button class="btn-add" onclick="addProduct()">+ Dodaj produkt</button>
-            <button class="btn-calc" onclick="runCalculation()">1. Przelicz Zestawy</button>
-            <button class="btn-print-formal btn-print-group" onclick="generatePDF('formal')" style="display:none;">2. PDF: Oficjalna Wycena</button>
-            <button class="btn-print-simple btn-print-group" onclick="generatePDF('simple')" style="display:none;">3. PDF: Szybka Lista</button>
+    <!-- SEKCJA KALKULATORA -->
+    <div id="calculator-view">
+        <div class="no-print">
+            <table class="product-table">
+                <thead>
+                    <tr>
+                        <th style="width: 30px;"></th>
+                        <th>Nazwa produktu</th>
+                        <th style="width: 10%;">Indeks</th>
+                        <th style="width: 25%;">Typ Promocji Dedyk.</th>
+                        <th style="width: 11%;">Cena wyj. (zł)</th>
+                        <th style="width: 11%;">Po kodzie (zł)</th>
+                        <th class="checkbox-cell" style="width: 8%; font-size:0.75rem;">Wyklucz<br>z Multi</th>
+                        <th style="width: 40px;"></th>
+                    </tr>
+                </thead>
+                <tbody id="product-body"></tbody>
+            </table>
+
+            <div class="actions">
+                <button class="btn-add" onclick="addProduct()">+ Dodaj produkt</button>
+                <button class="btn-calc" onclick="runCalculation()">1. Przelicz Zestawy</button>
+                <button class="btn-print-formal btn-print-group" onclick="generatePDF('formal')" style="display:none;">2. PDF: Oficjalna Wycena</button>
+                <button class="btn-print-simple btn-print-group" onclick="generatePDF('simple')" style="display:none;">3. PDF: Szybka Lista</button>
+            </div>
+        </div>
+
+        <div id="loader" class="loader no-print">Przeszukiwanie milionów kombinacji rabatowych...</div>
+
+        <div id="results" class="results">
+            <div class="summary-box">
+                <div style="font-size: 1.2rem;">Najlepsza cena łączna za wszystkie produkty:</div>
+                <div class="summary-price" id="total-price">0,00 zł</div>
+                <div style="color: var(--success); font-weight: bold; font-size: 1.1rem;" id="total-savings"></div>
+            </div>
+            <div class="grid-results" id="order-grid"></div>
         </div>
     </div>
 
-    <div id="loader" class="loader no-print">Przeszukiwanie milionów kombinacji rabatowych...</div>
-
-    <div id="results" class="results">
-        <div class="summary-box">
-            <div style="font-size: 1.2rem;">Najlepsza cena łączna za wszystkie produkty:</div>
-            <div class="summary-price" id="total-price">0,00 zł</div>
-            <div style="color: var(--success); font-weight: bold; font-size: 1.1rem;" id="total-savings"></div>
+    <!-- SEKCJA WIZUALIZATORA -->
+    <div id="visualizer-view" style="display: none;">
+        <div class="visualizer-container">
+            <!-- Lewa kolumna: Magazyn Sprzętu -->
+            <div class="vis-warehouse no-print">
+                <h3>📦 Magazyn Sprzętu</h3>
+                <p class="vis-subtitle">Kliknij produkt z listy, a następnie wskaż pulsujący na zielono slot w meblach kuchennych, aby go osadzić.</p>
+                <div id="vis-inventory-list" class="vis-inventory-list"></div>
+            </div>
+            
+            <!-- Prawa kolumna: Studio Kuchenne -->
+            <div class="vis-studio">
+                <h3 class="no-print">🍳 Studio Kuchenne (Elewacja 2D)</h3>
+                <p class="vis-subtitle no-print">Podgląd ułożenia urządzeń w meblach kuchennych.</p>
+                <div class="kitchen-elevation-wrapper">
+                    <div class="kitchen-grid" id="kitchen-grid-main">
+                        
+                        <!-- Słupek A: Lodówka -->
+                        <div class="kitchen-col">
+                            <div class="cabinet tall-cabinet">
+                                <div class="cabinet-door top-fridge-door"></div>
+                                <div class="cabinet-slot" id="slot-fridge" data-slot-type="fridge" onclick="handleSlotClick('fridge')">
+                                    <div class="slot-label">Zabudowa Lodówki</div>
+                                    <div class="slot-empty-visual"></div>
+                                    <div class="slot-content"></div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Słupek B: Piekarnik i Mikrofala -->
+                        <div class="kitchen-col">
+                            <div class="cabinet tall-cabinet">
+                                <div class="cabinet-door top-door"></div>
+                                <div class="cabinet-slot" id="slot-microwave" data-slot-type="microwave" onclick="handleSlotClick('microwave')">
+                                    <div class="slot-label">Mikrofalówka</div>
+                                    <div class="slot-empty-visual"></div>
+                                    <div class="slot-content"></div>
+                                </div>
+                                <div class="cabinet-slot" id="slot-oven" data-slot-type="oven" onclick="handleSlotClick('oven')">
+                                    <div class="slot-label">Piekarnik</div>
+                                    <div class="slot-empty-visual"></div>
+                                    <div class="slot-content"></div>
+                                </div>
+                                <div class="cabinet-door bottom-drawer"></div>
+                            </div>
+                        </div>
+                        
+                        <!-- Szafka z płytą, zmywarką i okapem -->
+                        <div class="kitchen-col base-col">
+                            <!-- Szafka górna z okapem -->
+                            <div class="cabinet upper-cabinet">
+                                <div class="cabinet-slot" id="slot-hood" data-slot-type="hood" onclick="handleSlotClick('hood')">
+                                    <div class="slot-label">Okap</div>
+                                    <div class="slot-empty-visual"></div>
+                                    <div class="slot-content"></div>
+                                </div>
+                            </div>
+                            
+                            <!-- Blat oraz backsplash -->
+                            <div class="backsplash">
+                                <div class="countertop">
+                                    <div class="cabinet-slot" id="slot-hob" data-slot-type="hob" onclick="handleSlotClick('hob')">
+                                        <div class="slot-label">Płyta</div>
+                                        <div class="slot-empty-visual"></div>
+                                        <div class="slot-content"></div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Szafka dolna ze zmywarką -->
+                            <div class="cabinet undercounter-cabinet">
+                                <div class="cabinet-slot" id="slot-dishwasher" data-slot-type="dishwasher" onclick="handleSlotClick('dishwasher')">
+                                    <div class="slot-label">Front Zmywarki</div>
+                                    <div class="slot-empty-visual"></div>
+                                    <div class="slot-content"></div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                    </div>
+                </div>
+            </div>
         </div>
-        <div class="grid-results" id="order-grid"></div>
+    </div>
+
+    <!-- DRUKOWANA WERSJA WIZUALIZACJI -->
+    <div id="print-kitchen-section" class="print-kitchen-section">
+        <h3>Szkic Podglądowy Zabudowy AGD</h3>
+        <div id="print-kitchen-placeholder"></div>
     </div>
 
     <div class="print-footer">
@@ -274,7 +853,6 @@
                     basePrice: p.b || '', codePrice: p.c || '', excluded: p.e || false
                 };
             });
-            // Czyszczenie paska adresu po imporcie
             window.history.replaceState(null, '', window.location.pathname);
         } catch(e) { console.error("Nieprawidłowy link udostępniania."); }
     }
@@ -286,7 +864,6 @@
             { id: Date.now(), name: '', index: '', types: [], basePrice: '', codePrice: '', excluded: false }
         ];
     }
-    // Konwersja i migracja formatów
     loadedProducts.forEach(p => {
         if (!p.types) {
             p.types = (p.type && p.type !== 'other') ? [p.type] : [];
@@ -367,12 +944,27 @@
     }
 
     function addProduct() { products.push({ id: Date.now(), name: '', index: '', types: [], basePrice: '', codePrice: '', excluded: false }); render(); save(); }
-    function remove(id) { products = products.filter(p => p.id !== id); render(); save(); }
+    
+    function remove(id) { 
+        products = products.filter(p => p.id !== id); 
+        // Synchronizacja z wizualizatorem
+        if (typeof kitchenSlots !== 'undefined') {
+            for (let s in kitchenSlots) {
+                if (kitchenSlots[s] === id) {
+                    kitchenSlots[s] = null;
+                }
+            }
+            saveSlots();
+        }
+        render(); save(); 
+    }
+
     function update(id, field, value) { 
         const p = products.find(p => p.id === id); 
         if (p) p[field] = value; 
         save(); hidePrintButtons();
     }
+
     function togglePromo(id, promoType) {
         const p = products.find(p => p.id === id);
         if (p) {
@@ -386,12 +978,21 @@
             save(); render(); hidePrintButtons();
         }
     }
+
     function clearData() {
         if(confirm("Wyczyścić dane i usunąć wyliczenia?")) {
             products = [{ id: Date.now(), name: '', index: '', types: [], basePrice: '', codePrice: '', excluded: false }];
+            // Reset wizualizatora
+            if (typeof kitchenSlots !== 'undefined') {
+                for (let s in kitchenSlots) {
+                    kitchenSlots[s] = null;
+                }
+                saveSlots();
+            }
             render(); save(); document.getElementById('results').style.display = 'none'; hidePrintButtons();
         }
     }
+
     function hidePrintButtons() { document.querySelectorAll('.btn-print-group').forEach(b => b.style.display = 'none'); }
 
     // --- SZYBKI ALGORYTM ---
@@ -426,11 +1027,10 @@
         let bestTotal = Infinity;
         let bestAssignment = null;
 
-        // Określamy dozwolone stany dla każdego produktu
         const allowedStates = items.map(it => {
-            const states = [0]; // Zawsze można kupić osobno/z kodem
+            const states = [0]; 
             if (!it.excluded) {
-                states.push(1, 2, 3, 4); // Grupy Multi
+                states.push(1, 2, 3, 4); 
             }
             if (it.types && it.types.length > 0) {
                 it.types.forEach(t => {
@@ -440,10 +1040,9 @@
             return states;
         });
 
-        // Dolny szacunek kosztu pozostałych produktów do szybkiego odcinania (pruningu)
         const minCosts = items.map(it => {
-            if (!it.excluded) return 100; // W Multi-rabatach cena może spaść do 1 zł (100 groszy)
-            let minC = it.baseGrosze * 0.5; // Maksymalny rabat specjalny to -50%
+            if (!it.excluded) return 100; 
+            let minC = it.baseGrosze * 0.5; 
             if (it.codeGrosze !== null && it.codeGrosze < minC) {
                 minC = it.codeGrosze;
             }
@@ -471,20 +1070,17 @@
         let currentLooseCost = 0;
 
         function dfs(idx, currentCostBound) {
-            // Pruning: Jeśli aktualny dolny szacunek kosztu przekracza dotychczasowy najlepszy wynik, przerywamy
             if (currentCostBound + suffixMinCost[idx] >= bestTotal) {
                 return;
             }
 
             if (idx === n) {
-                // Weryfikacja warunków dla par specjalnych
                 if (specialLists.washer.length !== specialLists.dryer.length) return;
                 if (specialLists.oven.length !== specialLists.hob.length) return;
                 if (specialLists.promo40.length % 2 !== 0) return;
 
                 let total = currentLooseCost;
 
-                // Obliczamy koszt par specjalnych
                 total += specialLists.washer.reduce((acc, val) => acc + Math.round(val * 0.5), 0);
                 total += specialLists.dryer.reduce((acc, val) => acc + val, 0);
                 total += specialLists.oven.reduce((acc, val) => acc + val, 0);
@@ -497,7 +1093,6 @@
                     }
                 }
 
-                // Obliczamy koszt grup Multi
                 for (let k = 0; k < 4; k++) {
                     if (multiCounts[k] === 0) continue;
                     if (multiCounts[k] === 1) {
@@ -682,10 +1277,324 @@
         const now = new Date();
         document.getElementById('print-date').innerHTML = `Data: <strong>${now.toLocaleDateString('pl-PL')}</strong>, godz. <strong>${now.toLocaleTimeString('pl-PL', {hour: '2-digit', minute:'2-digit'})}</strong>`;
         
+        syncPrintKitchen(); // Kopiuj stan wizualizacji do druku przed otwarciem okna systemowego
         window.print();
     }
 
+    // --- WIZUALIZATOR KUCHNI LOGIKA ---
+    let kitchenSlots = JSON.parse(localStorage.getItem('me_visualizer_slots')) || {
+        fridge: null,
+        microwave: null,
+        oven: null,
+        hood: null,
+        hob: null,
+        dishwasher: null
+    };
+    let customTypes = JSON.parse(localStorage.getItem('me_custom_types')) || {};
+    let selectedProductId = null;
+    let currentView = 'calculator';
+
+    const typeKeywords = {
+        fridge: [/lodów/i, /chłodz/i, /zamraż/i, /fridge/i, /refrigerator/i],
+        oven: [/piekarnik/i, /oven/i],
+        hob: [/płyta/i, /indukc/i, /gazowa/i, /hob/i, /cooktop/i],
+        microwave: [/mikrofal/i, /kuchenka mik/i, /microwave/i],
+        hood: [/okap/i, /hood/i, /pochłaniacz/i],
+        dishwasher: [/zmywar/i, /dishwasher/i],
+        washer: [/pralk/i, /washer/i, /washing/i],
+        dryer: [/suszar/i, /dryer/i]
+    };
+
+    const typeNamesPl = {
+        fridge: "Lodówka",
+        oven: "Piekarnik",
+        hob: "Płyta",
+        microwave: "Mikrofalówka",
+        hood: "Okap",
+        dishwasher: "Zmywarka",
+        washer: "Pralka",
+        dryer: "Suszarka"
+    };
+
+    function autoDetectType(name) {
+        if (!name) return '';
+        for (let type in typeKeywords) {
+            for (let regex of typeKeywords[type]) {
+                if (regex.test(name)) {
+                    return type;
+                }
+            }
+        }
+        return '';
+    }
+
+    function getProductType(product) {
+        if (customTypes[product.id]) return customTypes[product.id];
+        return autoDetectType(product.name);
+    }
+
+    function saveSlots() {
+        localStorage.setItem('me_visualizer_slots', JSON.stringify(kitchenSlots));
+    }
+
+    function saveCustomTypes() {
+        localStorage.setItem('me_custom_types', JSON.stringify(customTypes));
+    }
+
+    function switchView(view) {
+        currentView = view;
+        const calcBtn = document.getElementById('tab-btn-calculator');
+        const visBtn = document.getElementById('tab-btn-visualizer');
+        const calcView = document.getElementById('calculator-view');
+        const visView = document.getElementById('visualizer-view');
+
+        if (view === 'calculator') {
+            calcBtn.classList.add('active');
+            visBtn.classList.remove('active');
+            calcView.style.display = 'block';
+            visView.style.display = 'none';
+        } else {
+            calcBtn.classList.remove('active');
+            visBtn.classList.add('active');
+            calcView.style.display = 'none';
+            visView.style.display = 'block';
+            
+            // Czyszczenie nieistniejących produktów ze slotów
+            for (let s in kitchenSlots) {
+                if (kitchenSlots[s] !== null) {
+                    const exists = products.some(p => p.id === kitchenSlots[s]);
+                    if (!exists) {
+                        kitchenSlots[s] = null;
+                    }
+                }
+            }
+            saveSlots();
+            
+            selectedProductId = null;
+            removeSlotPulses();
+            renderWarehouse();
+            renderKitchen();
+            syncPrintKitchen();
+        }
+    }
+
+    function renderWarehouse() {
+        const list = document.getElementById('vis-inventory-list');
+        list.innerHTML = '';
+        
+        const validProducts = products.filter(p => p.name || p.index || p.basePrice);
+        
+        if (validProducts.length === 0) {
+            list.innerHTML = `<div style="text-align:center; padding:20px; color:var(--text-muted); font-style:italic;">Brak produktów w kalkulatorze. Dodaj produkty w zakładce Kalkulator, aby móc je tu zwizualizować.</div>`;
+            return;
+        }
+
+        validProducts.forEach(p => {
+            const isPlaced = Object.values(kitchenSlots).includes(p.id);
+            const pType = getProductType(p);
+            
+            const card = document.createElement('div');
+            card.className = `vis-item-card ${selectedProductId === p.id ? 'selected' : ''}`;
+            card.onclick = (e) => {
+                if (e.target.tagName === 'SELECT') return;
+                toggleProductSelect(p.id);
+            };
+
+            const statusClass = isPlaced ? 'vis-status-placed' : 'vis-status-in-store';
+            const statusTitle = isPlaced ? 'Zamontowano w kuchni' : 'W magazynie (niezamontowany)';
+            
+            let selectOptions = `<option value="">-- Wybierz typ slotu --</option>`;
+            for (let type in typeNamesPl) {
+                selectOptions += `<option value="${type}" ${pType === type ? 'selected' : ''}>${typeNamesPl[type]}</option>`;
+            }
+
+            card.innerHTML = `
+                <div class="vis-item-header">
+                    <div class="vis-item-name">${p.name || '<i>Bez nazwy</i>'}</div>
+                    <div class="vis-item-status ${statusClass}" title="${statusTitle}"></div>
+                </div>
+                <div style="margin-bottom: 8px;">
+                    ${p.index ? `<span class="vis-item-sku">SKU: ${p.index}</span>` : ''}
+                    <span class="vis-item-price">${p.basePrice ? p.basePrice + ' zł' : ''}</span>
+                </div>
+                <div class="vis-item-meta">
+                    <span style="font-size: 0.75rem; color:var(--text-muted);">Typ AGD:</span>
+                    <select class="vis-type-select" onchange="changeProductType(${p.id}, this.value)">
+                        ${selectOptions}
+                    </select>
+                </div>
+            `;
+            list.appendChild(card);
+        });
+    }
+
+    function changeProductType(productId, newType) {
+        if (newType) {
+            customTypes[productId] = newType;
+        } else {
+            delete customTypes[productId];
+        }
+        saveCustomTypes();
+        
+        for (let s in kitchenSlots) {
+            if (kitchenSlots[s] === productId && s !== newType) {
+                kitchenSlots[s] = null;
+            }
+        }
+        saveSlots();
+        
+        selectedProductId = null;
+        removeSlotPulses();
+        renderWarehouse();
+        renderKitchen();
+        syncPrintKitchen();
+    }
+
+    function toggleProductSelect(productId) {
+        if (selectedProductId === productId) {
+            selectedProductId = null;
+            removeSlotPulses();
+        } else {
+            selectedProductId = productId;
+            removeSlotPulses();
+            
+            const product = products.find(p => p.id === productId);
+            if (product) {
+                const type = getProductType(product);
+                if (type && ['fridge', 'oven', 'hob', 'microwave', 'hood', 'dishwasher'].includes(type)) {
+                    const targetSlot = document.getElementById(`slot-${type}`);
+                    if (targetSlot) {
+                        targetSlot.classList.add('pulse-target');
+                    }
+                }
+            }
+        }
+        renderWarehouse();
+    }
+
+    function removeSlotPulses() {
+        document.querySelectorAll('.cabinet-slot').forEach(slot => {
+            slot.classList.remove('pulse-target');
+        });
+    }
+
+    function handleSlotClick(slotType) {
+        const slotEl = document.getElementById(`slot-${slotType}`);
+        if (!slotEl || !slotEl.classList.contains('pulse-target')) return;
+        
+        if (selectedProductId !== null) {
+            for (let s in kitchenSlots) {
+                if (kitchenSlots[s] === selectedProductId) {
+                    kitchenSlots[s] = null;
+                }
+            }
+            
+            kitchenSlots[slotType] = selectedProductId;
+            saveSlots();
+            
+            selectedProductId = null;
+            removeSlotPulses();
+            renderWarehouse();
+            renderKitchen();
+            syncPrintKitchen();
+        }
+    }
+
+    function removeProductFromSlot(slotType, event) {
+        if (event) event.stopPropagation();
+        kitchenSlots[slotType] = null;
+        saveSlots();
+        
+        selectedProductId = null;
+        removeSlotPulses();
+        renderWarehouse();
+        renderKitchen();
+        syncPrintKitchen();
+    }
+
+    function renderKitchen() {
+        for (let slotType in kitchenSlots) {
+            const slotEl = document.getElementById(`slot-${slotType}`);
+            if (!slotEl) continue;
+            
+            const contentEl = slotEl.querySelector('.slot-content');
+            const labelEl = slotEl.querySelector('.slot-label');
+            const visualEl = slotEl.querySelector('.slot-empty-visual');
+            
+            const productId = kitchenSlots[slotType];
+            
+            if (productId !== null) {
+                const product = products.find(p => p.id === productId);
+                if (product) {
+                    labelEl.style.display = 'none';
+                    if (visualEl) visualEl.style.display = 'none';
+                    contentEl.style.display = 'flex';
+                    
+                    const imgIndex = product.index ? product.index.trim() : '';
+                    
+                    if (imgIndex) {
+                        const img = new Image();
+                        img.onload = () => {
+                            contentEl.innerHTML = `
+                                <img src="img/${imgIndex}.png" alt="${product.name}">
+                                <div class="slot-product-overlay">${product.name}</div>
+                                <button class="slot-remove-btn" onclick="removeProductFromSlot('${slotType}', event)" title="Zdemontuj">✖</button>
+                            `;
+                        };
+                        img.onerror = () => {
+                            contentEl.innerHTML = `
+                                <img src="img/generic-${slotType}.svg" alt="${product.name}">
+                                <div class="slot-product-overlay">${product.name}</div>
+                                <button class="slot-remove-btn" onclick="removeProductFromSlot('${slotType}', event)" title="Zdemontuj">✖</button>
+                            `;
+                        };
+                        img.src = `img/${imgIndex}.png`;
+                    } else {
+                        contentEl.innerHTML = `
+                            <img src="img/generic-${slotType}.svg" alt="${product.name}">
+                            <div class="slot-product-overlay">${product.name}</div>
+                            <button class="slot-remove-btn" onclick="removeProductFromSlot('${slotType}', event)" title="Zdemontuj">✖</button>
+                        `;
+                    }
+                    continue;
+                }
+            }
+            
+            labelEl.style.display = 'block';
+            if (visualEl) visualEl.style.display = 'block';
+            contentEl.style.display = 'none';
+            contentEl.innerHTML = '';
+        }
+    }
+
+    function syncPrintKitchen() {
+        const activeSlots = Object.values(kitchenSlots).some(v => v !== null);
+        const printSection = document.getElementById('print-kitchen-section');
+        if (activeSlots) {
+            printSection.classList.add('active');
+            const originalGrid = document.getElementById('kitchen-grid-main');
+            const printPlaceholder = document.getElementById('print-kitchen-placeholder');
+            printPlaceholder.innerHTML = originalGrid.outerHTML;
+            
+            printPlaceholder.querySelectorAll('[id]').forEach(el => el.removeAttribute('id'));
+            printPlaceholder.querySelectorAll('.slot-remove-btn').forEach(btn => btn.style.display = 'none');
+        } else {
+            printSection.classList.remove('active');
+        }
+    }
+
+    // --- REJESTRACJA SERVICE WORKERA (PWA) ---
+    if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+            navigator.serviceWorker.register('./sw.js')
+                .then(reg => console.log('Service Worker zarejestrowany pomyślnie!', reg.scope))
+                .catch(err => console.log('Błąd rejestracji Service Workera:', err));
+        });
+    }
+
     render();
+    renderKitchen();
+    syncPrintKitchen();
 </script>
 
 </body>

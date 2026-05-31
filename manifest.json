@@ -1,0 +1,24 @@
+{
+  "name": "Optymalizator Zestawów ME PRO",
+  "short_name": "Optymalizator ME",
+  "description": "Kalkulator i wizualizator zestawów AGD Media Expert",
+  "start_url": "index.html",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#1a1a1a",
+  "theme_color": "#ffe600",
+  "icons": [
+    {
+      "src": "img/generic-oven.svg",
+      "sizes": "192x192",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    },
+    {
+      "src": "img/generic-oven.svg",
+      "sizes": "512x512",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    }
+  ]
+}

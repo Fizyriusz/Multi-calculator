@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 400" width="100%" height="100%">
+  <!-- Dishwasher Body / Cabinet Door Shape -->
+  <rect x="10" y="10" width="380" height="380" rx="8" fill="#2d3748" stroke="#1a202c" stroke-width="4"/>
+  <!-- Integrated Control Panel at the top -->
+  <rect x="15" y="15" width="370" height="45" fill="url(#panel-steel)" stroke="#333" stroke-width="1"/>
+  <!-- LED Status Display -->
+  <rect x="170" y="22" width="60" height="20" rx="2" fill="#000"/>
+  <text x="200" y="36" fill="#00ff00" font-family="monospace" font-weight="bold" font-size="12" text-anchor="middle">0:45</text>
+  <!-- Buttons -->
+  <circle cx="40" cy="37" r="6" fill="#4a5568" stroke="#718096" stroke-width="1"/>
+  <circle cx="60" cy="37" r="6" fill="#4a5568" stroke="#718096" stroke-width="1"/>
+  <circle cx="80" cy="37" r="6" fill="#4a5568" stroke="#718096" stroke-width="1"/>
+  <circle cx="320" cy="37" r="7" fill="#2f855a" stroke="#48bb78" stroke-width="1"/>
+  <!-- Main Cabinet Panel (Under Panel) -->
+  <rect x="15" y="65" width="370" height="320" rx="4" fill="#3e4a5d" stroke="#2b3544" stroke-width="2"/>
+  <!-- Sleek Handle Bar -->
+  <rect x="60" y="90" width="280" height="15" rx="3" fill="url(#panel-steel)" stroke="#333" stroke-width="1"/>
+  <defs>
+    <linearGradient id="panel-steel" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#ffffff"/>
+      <stop offset="30%" stop-color="#cbd5e0"/>
+      <stop offset="70%" stop-color="#718096"/>
+      <stop offset="100%" stop-color="#4a5568"/>
+    </linearGradient>
+  </defs>
+</svg>

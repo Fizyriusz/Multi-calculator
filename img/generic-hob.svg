@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 250" width="100%" height="100%">
+  <!-- Glass Hob Surface -->
+  <rect x="5" y="5" width="390" height="240" rx="10" fill="#0d0d11" stroke="#2a2b30" stroke-width="5"/>
+  <!-- Top Left Burner -->
+  <circle cx="110" cy="80" r="45" fill="none" stroke="#4b5563" stroke-width="2" stroke-dasharray="8,4"/>
+  <circle cx="110" cy="80" r="15" fill="none" stroke="#4b5563" stroke-width="1"/>
+  <!-- Bottom Left Burner -->
+  <circle cx="110" cy="170" r="45" fill="none" stroke="#4b5563" stroke-width="2" stroke-dasharray="8,4"/>
+  <circle cx="110" cy="170" r="15" fill="none" stroke="#4b5563" stroke-width="1"/>
+  <!-- Top Right Burner (Large) -->
+  <circle cx="290" cy="100" r="55" fill="none" stroke="#4b5563" stroke-width="2" stroke-dasharray="8,4"/>
+  <circle cx="290" cy="100" r="20" fill="none" stroke="#4b5563" stroke-width="1"/>
+  <!-- Bottom Right Burner (Small) -->
+  <circle cx="290" cy="190" r="35" fill="none" stroke="#4b5563" stroke-width="2" stroke-dasharray="8,4"/>
+  <circle cx="290" cy="190" r="10" fill="none" stroke="#4b5563" stroke-width="1"/>
+  <!-- Control Panel (Center Bottom) -->
+  <rect x="150" y="210" width="100" height="20" rx="3" fill="#15161b"/>
+  <!-- Power Key -->
+  <circle cx="160" cy="220" r="5" fill="none" stroke="#ef4444" stroke-width="2"/>
+  <line x1="160" y1="216" x2="160" y2="220" stroke="#ef4444" stroke-width="2"/>
+  <!-- Sliders/Sensors -->
+  <line x1="175" y1="220" x2="215" y2="220" stroke="#6b7280" stroke-width="2"/>
+  <!-- Power level numbers -->
+  <text x="235" y="226" fill="#ef4444" font-family="monospace" font-size="12" font-weight="bold">9</text>
+  <text x="243" y="226" fill="#6b7280" font-family="monospace" font-size="10">.</text>
+</svg>
